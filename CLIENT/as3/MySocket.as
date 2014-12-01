@@ -9,10 +9,10 @@
 	public class MySocket extends DatagramSocket {
 
 		// server/client address info
-		var ipClient:String = "10.0.0.10";
-		var ipServer:String = "10.0.0.10";
-		var portClient:int = 4321;
-		var portServer:int = 1234;
+		var ipClient:String = "10.252.20.131";
+		var ipServer:String = "10.252.20.131";
+		var portClient:int = 4326;
+		var portServer:int = 1236;
 		
 		// constructor
 		function MySocket() {

@@ -10,6 +10,7 @@
 		var player2:Player;
 		
 		var players:Array = new Array();
+		var attacks:Array = new Array();
 		var spawns:Array = new Array();
 		var enemies:Array = new Array();
 		var pickups:Array = new Array();
@@ -24,6 +25,8 @@
 			cam = new Camera();
 			player = new Player(Config.StageWidth/2, Config.StageHeight/2, 1);
 			//player2 = new Player(Config.StageWidth/2, Config.StageHeight, 2);
+			players.push(player);
+			
 			spawns.push(new EnemySpawner(30, 450));
 			//enemies.push(new EnemyHopper(Config.StageWidth/3, Config.StageHeight/2));
 			//enemies.push(new EnemyTurret(Config.StageWidth/3, Config.StageHeight/2));
@@ -50,6 +53,15 @@
 				cam.Update(player.worldX, player.worldY);
 				level.Update(cam);
 				
+				attacks = new Array();
+				if(player.isAttacking){
+					for(var i:int = 0; i < player.attacks.length; i++){
+						trace("Attack added to array");
+						attacks.push(player.attacks[i]);
+						addChild(player.attacks[i]);
+					}
+				}
+				
 				//player2.Update(dt, cam);
 				
 				// update enemies
@@ -69,8 +81,28 @@
 						player.Hurt(e.damage);
 						if(e is EnemyBullet){
 							KillEnemy(i);
+							continue;
 						}
 					}
+				
+					//check player attack fields
+					//for(var i:int = 0; i < players.length; i++){
+						for(var af:int = 0; af < attacks.length; af++){
+							attacks[af].Update(cam);
+							
+							if(e.aabb.IsCollidingWith(attacks[af].aabb)){
+								trace("  }- Have some pain! :D");
+								
+								if(!(e is EnemyBullet)){
+									KillEnemy(i);
+									continue;
+								}
+							}
+							else{
+								//trace("  }- Missed. :c");
+							}
+						}
+					//}
 				}
 				
 				for(var i:int = spawns.length-1; i >=0; i--){

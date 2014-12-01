@@ -7,9 +7,9 @@
 		public var hosting:Boolean;
 
 		public function GameStateManager() {
-			SwitchToTitle();
+			//SwitchToTitle();
 			Main.socket.Start();
-			//SwitchToPlay();
+			SwitchToPlay();
 		}
 		
 		public function Update(dt:Number):void{			
