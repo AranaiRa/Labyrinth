@@ -24,22 +24,26 @@
 			
 			cam = new Camera();
 			player = new Player(Config.StageWidth/2, Config.StageHeight/2, 1);
-			//player2 = new Player(Config.StageWidth/2, Config.StageHeight, 2);
+			player2 = new Player(Config.StageWidth/2, Config.StageHeight, 2);
 			players.push(player);
+			players.push(player2);
 			
 			spawns.push(new EnemySpawner(30, 450));
 			//enemies.push(new EnemyHopper(Config.StageWidth/3, Config.StageHeight/2));
 			//enemies.push(new EnemyTurret(Config.StageWidth/3, Config.StageHeight/2));
 			enemies.push(new EnemyRanger(Config.StageWidth/3, Config.StageHeight/2));
 			
-			addChild(player);
 			addChild(level);
-			//addChild(player2);
 			
-			for(var i:int = spawns.length-1; i >=0; i--){
+			for(var i:int = players.length-1; i >= 0; i--){
+				addChild(players[i]);
+			}
+			
+			for(var i:int = spawns.length-1; i >= 0; i--){
 				addChild(spawns[i]);
 			}
-			for(var i:int = enemies.length-1; i >=0; i--){
+			
+			for(var i:int = enemies.length-1; i >= 0; i--){
 				addChild(enemies[i]);
 			}
 			
@@ -49,10 +53,13 @@
 		public override function Update():void{
 			var dt:Number = .05;
 			if(wait < 0){
-				player.Update(dt, cam, level);
-				cam.Update(player.worldX, player.worldY);
+				for(var i:int = 0; i < players.length; i++){
+					players[i].Update(dt, cam, level);
+					if(players[i].index == 1) cam.Update(player.worldX, player.worldY);
+				}
 				level.Update(cam);
 				
+				// put in players loop
 				attacks = new Array();
 				if(player.isAttacking){
 					for(var i:int = 0; i < player.attacks.length; i++){
@@ -61,8 +68,6 @@
 						addChild(player.attacks[i]);
 					}
 				}
-				
-				//player2.Update(dt, cam);
 				
 				// update enemies
 				for(var i:int = enemies.length-1; i >=0; i--){
@@ -76,7 +81,7 @@
 						e.bullet = null;
 					}
 					
-					
+					// put in players loop
 					if(e.aabb.IsCollidingWith(player.aabb) && e.hurtOnContact){
 						player.Hurt(e.damage);
 						if(e is EnemyBullet){
@@ -86,6 +91,7 @@
 					}
 				
 					//check player attack fields
+					// put in players loop
 					//for(var i:int = 0; i < players.length; i++){
 						for(var af:int = 0; af < attacks.length; af++){
 							attacks[af].Update(cam);
@@ -105,6 +111,7 @@
 					//}
 				}
 				
+				// put in players loop
 				for(var i:int = spawns.length-1; i >=0; i--){
 					var spawn:EnemySpawner = spawns[i];
 					spawn.Update(cam);
@@ -113,6 +120,7 @@
 					}
 				}
 				
+				// put in players loop
 				for(var i:int = pickups.length-1; i >=0; i--){
 					var pickup:Pickup = pickups[i];
 					pickup.Update(dt, cam);
@@ -120,9 +128,6 @@
 						GetPickup(i);
 					}
 				}
-				
-				//player.CalculateCollisions(player2)
-				//player2.CalculateCollisions(player)
 			}else{
 				wait -= dt;
 			}

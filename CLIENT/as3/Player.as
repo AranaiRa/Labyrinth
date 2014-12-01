@@ -13,7 +13,7 @@
 		var JUMP_FALL:int = 9;
 		var IDLE:int = 10;
 		
-		var index:int;
+		public var index:int;
 		var aabb:AABB;
 		var worldX:Number, worldY:Number;
 		var speedX:Number = 0;
@@ -125,7 +125,7 @@
 		
 		public function Update(dt:Number, cam:Camera, level:Level):void{
 			if(index == 1) Update1(dt, level);
-			if(index == 2) Update2(dt, cam);
+			if(index == 2) Update2(dt, cam, level);
 			UpdateAnimations();
 		}
 		
