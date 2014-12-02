@@ -1,5 +1,6 @@
 ﻿package as3 {
 	import flash.display.MovieClip;
+	import flash.display.DisplayObject;
 	
 	public class Level extends MovieClip{
 
@@ -89,5 +90,31 @@
 			return collision;
 		}
 		
+		public function GetValidSpawnLocation():DisplayObject {
+			trace(grid);
+			
+			var target:int = Random.Range(1,100);
+			var px:Number = 0;
+			var py:Number = 0;
+			
+			for (var i:uint = 0; i < levelData.width; i++){
+				for (var j:uint = 0; j < levelData.height; j++){
+					var pixel:uint = levelData.getPixel(i, j); 
+					if(pixel.toString(16) == "0"){
+						target--;
+						if(target == 0){
+							px = j;
+							py = i;
+						}
+					}
+				} // end j loop
+			} // end i loop
+			
+			var d:DisplayObject = new DisplayObject();
+			d.x = GridToWorld(px);
+			d.y = GridToWorld(py);
+			
+			return d;
+		}
 	}	
 }

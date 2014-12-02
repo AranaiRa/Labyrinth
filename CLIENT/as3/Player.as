@@ -125,7 +125,7 @@
 		
 		public function Update(dt:Number, cam:Camera, level:Level):void{
 			if(index == 1) Update1(dt, level);
-			if(index == 2) Update2(dt, cam, level);
+			if(index == 2) Update2(dt, cam);
 			UpdateAnimations();
 		}
 		

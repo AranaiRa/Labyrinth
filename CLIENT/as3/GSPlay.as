@@ -48,6 +48,7 @@
 			}
 			
 			Config.timer.start();
+			level.GetValidSpawnLocation();
 		}
 		
 		public override function Update():void{
