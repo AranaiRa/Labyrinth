@@ -19,21 +19,21 @@
 		var roundTimer:Number = 30;
 		var wait:Number = 1; // how long to wait before beginning updates, to fix dt
 		
+		
 
 		public function GSPlay(gsm:GameStateManager) {
 			super(gsm);
 			
 			cam = new Camera();
-			var pos:Point = level.GetValidSpawnLocation();
-			trace("initializing player at x:"+pos.x+" y:"+pos.y);
 			player = new Player(Config.StageWidth/2, Config.StageHeight/2, 1);
-			player.worldX = pos.x;
-			player.worldY = pos.y;
 			player2 = new Player(Config.StageWidth/2, Config.StageHeight, 2);
 			players.push(player);
 			players.push(player2);
 			
-			spawns.push(new EnemySpawner(30, 450));
+			SpawnPlayer(player);
+			SpawnPlayer(player2);
+			
+			GenerateEnemySpawner();
 			//enemies.push(new EnemyHopper(Config.StageWidth/3, Config.StageHeight/2));
 			//enemies.push(new EnemyTurret(Config.StageWidth/3, Config.StageHeight/2));
 			enemies.push(new EnemyRanger(Config.StageWidth/3, Config.StageHeight/2));
@@ -64,6 +64,11 @@
 					if(players[i].index == 1) cam.Update(player.worldX, player.worldY);
 				}
 				level.Update(cam);
+				
+				// put in players loop
+				if(player.health <= 0){
+					SpawnPlayer(player);
+				}
 				
 				// put in players loop
 				attacks = new Array();
@@ -155,6 +160,29 @@
 			}
 		}
 		
+		public function SpawnPlayer(p:Player):void{
+			trace("spawning player "+p.index);
+			trace("lives: "+p.lives);
+			p.lives--;
+			if(p.lives >= 0){
+				p.health = p.maxHealth;
+				var pos:Point = level.GetValidSpawnLocation();
+				p.worldX = pos.x;
+				p.worldY = pos.y;
+			}
+			else{
+				trace("Hey, uh, maybe player "+p.index+" should be dead?");
+			}
+		}
+		
+		public function GenerateEnemySpawner():void{
+			trace("creating point");
+			var pos:Point = level.GetValidSpawnLocation();
+			trace("creating spawner");
+			spawns.push(new EnemySpawner(pos.x, pos.y));
+			trace("done");
+		}
+		
 		public function KillEnemy(index:int):void{
 			var enemy:Enemy = enemies.splice(index, 1)[0];
 			if(!(enemy is EnemyBullet)){ // bullets don't drop pickups
@@ -193,14 +221,19 @@
 		}
 		
 		public function ActivateSpawner(index:int):void{
-			var spawn:EnemySpawner = spawns.splice(index, 1)[0];
+			//var spawn:EnemySpawner = spawns.splice(index, 1)[0];
+			var spawn:EnemySpawner = spawns[index];
 			
 			var newEnemies:Array = spawn.SpawnEnemies();
 			for(var i:int = 0; i < newEnemies.length; i++){
 				enemies.push(newEnemies[i]);
 				addChild(newEnemies[i]);
 			}
-			removeChild(spawn);
+			//removeChild(spawn);
+			
+			var posNew:Point = level.GetValidSpawnLocation();
+			spawn.worldX = posNew.x;
+			spawn.worldY = posNew.y;
 		}
 	}
 }

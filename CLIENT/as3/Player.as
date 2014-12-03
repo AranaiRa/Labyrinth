@@ -33,6 +33,7 @@
 		var jumpsLeft:int = 2;
 		
 		// stats
+		var lives:int = 3;
 		var health:int = 100;
 		var maxHealth:int = 100;
 		var hurtTimer:Number = 0;
