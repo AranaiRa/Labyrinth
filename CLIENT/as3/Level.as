@@ -1,18 +1,19 @@
 ﻿package as3 {
 	import flash.display.MovieClip;
 	import flash.display.DisplayObject;
+	import flash.geom.Point;
 	
 	public class Level extends MovieClip{
 
 		var levelData:LevelData = new LevelData();
-		var size:uint = 64; //tile size
+		var size:uint = Config.TileSize;
 		var grid:Array;
 		var tiles:Array;
 		
 		public function Level() {
 			grid = new Array(levelData.width);
 			tiles = new Array();
-			
+			trace("w:"+levelData.width+" h:"+levelData.height);
 			for (var i:uint = 0; i < levelData.width; i++){
 				grid[i] = new Array();
 				for (var j:uint = 0; j < levelData.height; j++){
@@ -90,30 +91,19 @@
 			return collision;
 		}
 		
-		public function GetValidSpawnLocation():DisplayObject {
-			trace(grid);
-			
-			var target:int = Random.Range(1,100);
-			var px:Number = 0;
-			var py:Number = 0;
-			
-			for (var i:uint = 0; i < levelData.width; i++){
-				for (var j:uint = 0; j < levelData.height; j++){
-					var pixel:uint = levelData.getPixel(i, j); 
-					if(pixel.toString(16) == "0"){
-						target--;
-						if(target == 0){
-							px = j;
-							py = i;
-						}
-					}
-				} // end j loop
-			} // end i loop
-			
-			var d:DisplayObject = new DisplayObject();
-			d.x = GridToWorld(px);
-			d.y = GridToWorld(py);
-			
+		public function GetValidSpawnLocation():Point {
+			var d:Point = new Point(0,0);
+			while(true){
+				var gx:int = int(Random.Range(1,levelData.width-1));
+				var gy:int = int(Random.Range(1,levelData.height-1));
+				
+				if(grid[gx][gy] > 0)
+					continue;
+				else{
+					d = new Point(GridToWorld(gx), GridToWorld(gy));
+					break;
+				}
+			}
 			return d;
 		}
 	}	

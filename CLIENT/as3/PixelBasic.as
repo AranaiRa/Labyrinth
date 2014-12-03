@@ -6,13 +6,14 @@
 	
 	public class PixelBasic extends MovieClip {
 		
+		var id:uint;
+		
 		public function PixelBasic() {
-			setInterval(CleanUp, 1500);
-			trace("initialized");
+			id = setInterval(CleanUp, 1500);
 		}
 		
 		function CleanUp():void{
-			trace("cleaning up");
+			clearInterval(id);
 			this.parent.removeChild(this);
 		}
 	}

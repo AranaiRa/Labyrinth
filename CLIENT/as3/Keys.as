@@ -27,6 +27,8 @@
 		static var Energy3:Boolean = false;
 		static var Energy3Prev:Boolean = false;
 		
+		static var FacingLeft:Boolean = true;
+		
 		/***
 	 	 * This method is called from the event listener function.
 		 * The parameters are the KeyboardEvent from the listener, to get the keyCode,
@@ -97,6 +99,9 @@
 			Energy1Prev = Energy1;
 			Energy2Prev = Energy2;
 			Energy3Prev = Energy3;
+			
+			if(Left) FacingLeft = true;
+			else if(Right) FacingLeft = false;
 		}
 	}
 }

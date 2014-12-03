@@ -1,5 +1,6 @@
 ﻿package as3 {
 	import flashx.textLayout.formats.Float;
+	import flash.geom.Point;
 	
 	public class GSPlay extends GameState {
 		
@@ -23,7 +24,11 @@
 			super(gsm);
 			
 			cam = new Camera();
+			var pos:Point = level.GetValidSpawnLocation();
+			trace("initializing player at x:"+pos.x+" y:"+pos.y);
 			player = new Player(Config.StageWidth/2, Config.StageHeight/2, 1);
+			player.worldX = pos.x;
+			player.worldY = pos.y;
 			player2 = new Player(Config.StageWidth/2, Config.StageHeight, 2);
 			players.push(player);
 			players.push(player2);
@@ -110,6 +115,22 @@
 							}
 						}
 					//}
+					
+					// bullet culling
+					if(e is EnemyBullet){
+						var epos:Point = new Point(e.worldX, e.worldY);
+						var tooFar:Boolean = true;
+						// put in players loop
+						var ppos:Point = new Point(player.worldX, player.worldY);
+						if(Point.distance(epos, ppos) < 1500){
+							tooFar = false;
+							//break;
+						}
+						if(tooFar){
+							enemies.splice(i,1);
+							continue;
+						}
+					}
 				}
 				
 				// put in players loop

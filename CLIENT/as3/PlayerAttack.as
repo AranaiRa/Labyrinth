@@ -28,7 +28,6 @@
 		}
 		
 		function CleanUp():void{
-			trace("cleaning up");
 			clearInterval(interval);
 			this.parent.removeChild(this);
 		}

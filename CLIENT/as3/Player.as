@@ -29,6 +29,7 @@
 		
 		var hasJetpack:Boolean = false;
 		var hasDoubleJump:Boolean = true;
+		var hasBuzzsaw:Boolean = false;
 		var jumpsLeft:int = 2;
 		
 		// stats
@@ -182,7 +183,10 @@
 			// Attack logic
 			isAttacking = false;
 			if(Keys.OnPress("Attack1")){
-				GenerateBasicAttackField();
+				if(hasBuzzsaw)
+					GenerateForwardAttackField();
+				else
+					GenerateBasicAttackField();
 				isAttacking = true;
 				//trace("DEBUG: Attack1 pushed");
 			}
@@ -305,7 +309,10 @@
 			var pw;
 			var ph;
 			
-			px = -(Config.TileSize * 0.5);
+			if(Keys.FacingLeft)
+				px = -(Config.TileSize * 0.5);
+			else
+				px = (Config.TileSize * 0.5);
 			py = 0;
 			pw = Config.TileSize * 2;
 			ph = Config.TileSize;
@@ -314,61 +321,76 @@
 		}
 		
 		public function GenerateForwardAttackField():void{
-			var pb1:PixelBasic = new PixelBasic();
-			pb1.width = Config.TileSize * 4;
-			pb1.height = Config.TileSize;
-			pb1.x -= Config.TileSize * 2.5;
-			pb1.y -= Config.TileSize / 2;
+			attacks = new Array();
+			var px;
+			var py;
+			var pw;
+			var ph;
 			
-			this.addChild(pb1);
+			if(Keys.FacingLeft)
+				px = -(Config.TileSize * 0.5);
+			else
+				px = (Config.TileSize * 0.5);
+			py = 0;
+			pw = Config.TileSize * 4;
+			ph = Config.TileSize;
+			
+			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
 		}
 		
 		public function GenerateFrontalAttackField():void{
-			var pb1:PixelBasic = new PixelBasic();
-			pb1.width = Config.TileSize * 2;
-			pb1.height = Config.TileSize * 3;
-			pb1.x -= Config.TileSize * 1.5;
-			pb1.y -= Config.TileSize * 1.5;
+			attacks = new Array();
+			var px;
+			var py;
+			var pw;
+			var ph;
 			
-			this.addChild(pb1);
+			if(Keys.FacingLeft)
+				px = -(Config.TileSize * 0.5);
+			else
+				px = (Config.TileSize * 0.5);
+			py = 0;
+			pw = Config.TileSize * 2;
+			ph = Config.TileSize * 3;
+			
+			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
 		}
 		
 		public function GenerateRadialAttackField():void{
-			var pb1:PixelBasic = new PixelBasic();
-			pb1.width = Config.TileSize * 3;
-			pb1.height = Config.TileSize * 3;
-			pb1.x -= Config.TileSize * 1.5;
-			pb1.y -= Config.TileSize * 1.5;
+			attacks = new Array();
+			var px;
+			var py;
+			var pw;
+			var ph;
 			
-			var pb2:PixelBasic = new PixelBasic();
-			pb2.width = Config.TileSize;
-			pb2.height = Config.TileSize;
-			pb2.x -= Config.TileSize / 2;
-			pb2.y -= Config.TileSize * 2.5;
-		
-			var pb3:PixelBasic = new PixelBasic();
-			pb3.width = Config.TileSize;
-			pb3.height = Config.TileSize;
-			pb3.x -= Config.TileSize / 2;
-			pb3.y += Config.TileSize * 1.5;
-		
-			var pb4:PixelBasic = new PixelBasic();
-			pb4.width = Config.TileSize;
-			pb4.height = Config.TileSize;
-			pb4.x -= Config.TileSize * 2.5;
-			pb4.y -= Config.TileSize / 2;
-		
-			var pb5:PixelBasic = new PixelBasic();
-			pb5.width = Config.TileSize;
-			pb5.height = Config.TileSize;
-			pb5.x += Config.TileSize * 1.5;
-			pb5.y -= Config.TileSize / 2;
-		
-			this.addChild(pb1);
-			this.addChild(pb2);
-			this.addChild(pb3);
-			this.addChild(pb4);
-			this.addChild(pb5);
+			px = 0;
+			py = 0;
+			pw = Config.TileSize * 3;
+			ph = Config.TileSize * 3;
+			
+			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+			
+			px = 0;
+			py = (-Config.TileSize * 2);
+			pw = Config.TileSize;
+			ph = Config.TileSize;
+			
+			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+			
+			px = 0;
+			py = -py;
+			
+			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+			
+			px = (-Config.TileSize * 2);
+			py = 0;
+			
+			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+			
+			px = -px;
+			py = 0;
+			
+			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
 		}
 	}
 }
