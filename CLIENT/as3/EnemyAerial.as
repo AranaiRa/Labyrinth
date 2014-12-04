@@ -6,11 +6,17 @@
 	public class EnemyAerial extends Enemy {
 		
 		var moveRight = false;
-		var moveLeft = false;
+		var moveUp = false;
+		var vec:Number = 0.075;
 				
 		public function EnemyAerial(x:Number, y:Number) {
 			worldX = x;
 			worldY = y;
+			
+			var r:int = Random.ChooseOne([1, 2]);
+			var u:int = Random.ChooseOne([1, 2]);
+			if(r == 1) moveRight = true;
+			if(u == 1) moveUp = true;
 			
 			super(x, y, width, height, 100);
 			
@@ -19,46 +25,11 @@
 			super.hurtOnContact = true;
 		}
 		
-		private function Jump(){
-			grounded = false;
-			speedY = -maxSpeedY;
-		}
-		
 		public override function Update(dt:Number, cam:Camera, player:Player):void{
-			if(!grounded){
-				speedY += a * dt;
-				
-				if(moveRight){
-					speedX += this.a * dt;
-				}
-				else if(moveLeft){
-					speedX -= this.a * dt;
-				}else{
-					speedX *= .85;
-				}
-				
-				if(player.worldX > this.worldX) moveLeft = false;
-				if(player.worldX < this.worldX) moveRight = false;
-				
-				if(speedX > maxSpeedX) speedX = maxSpeedX;
-				if(speedX < -maxSpeedX) speedX = -maxSpeedX;
-			}else{
-				if(player.worldX > this.worldX){
-					moveRight = true;
-					moveLeft = false;
-				}
-				if(player.worldX < this.worldX){
-					moveRight = false;
-					moveLeft = true;
-				}
-			}
-			
-			if(worldY + speedY * dt > Config.StageHeight - aabb.halfH*2){
-				
-			}
-			
-			worldX += speedX * dt;
-			worldY += speedY * dt;
+			if(moveRight) worldX += this.a * dt * vec;
+			else          worldX -= this.a * dt * vec;
+			if(moveUp) worldY -= this.a * dt * vec;
+			else       worldY += this.a * dt * vec;
 		
 			super.Update(dt, cam, player);			
 		}

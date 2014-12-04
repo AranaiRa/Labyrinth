@@ -176,11 +176,8 @@
 		}
 		
 		public function GenerateEnemySpawner():void{
-			trace("creating point");
 			var pos:Point = level.GetValidSpawnLocation();
-			trace("creating spawner");
 			spawns.push(new EnemySpawner(pos.x, pos.y));
-			trace("done");
 		}
 		
 		public function KillEnemy(index:int):void{
@@ -202,20 +199,28 @@
 			switch(pickup.type){
 				case Pickup.HPUP:
 					player.AddHealth(pickup.amount);
+					player.HP += pickup.amount;
+					player.maxHealth += pickup.amount;
+					player.health += pickup.amount;
 				break;				
 				case Pickup.ATKUP:
 					player.AddHealth(pickup.amount);
-				break;
-				case Pickup.ENERGYATKUP:
-					player.AddHealth(pickup.amount);
+					player.ATK += pickup.amount;
 				break;
 				case Pickup.SPDUP:
 					player.AddHealth(pickup.amount);
+					player.SPD += pickup.amount;
+					player.speedMultiplier += (pickup.amount / 100.0);
 				break;
 				case Pickup.ENERGYUP:
 					player.AddHealth(pickup.amount);
+					player.ENERGY += pickup.amount;
+					player.maxEnergy += pickup.amount;
+					player.energy += pickup.amount;
 				break;
 			}
+			
+			trace("HP:"+player.HP+" EP:"+player.ENERGY+" ATT:"+player.ATK+" SPD:"+player.SPD);
 			
 			removeChild(pickup);
 		}

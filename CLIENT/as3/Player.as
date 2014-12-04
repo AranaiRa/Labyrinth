@@ -36,18 +36,29 @@
 		var lives:int = 3;
 		var health:int = 100;
 		var maxHealth:int = 100;
+		var energy:int = 100;
+		var maxEnergy:int = 100;
 		var hurtTimer:Number = 0;
 		var hurtTimerMax:Number = 1.5;
 		var damageMultiplier:Number = 1;
 		var energyMultiplier:Number = 1;
 		var speedMultiplier:Number = 1;
+		var regeneration:Number = 0;
 		
 		// ui
 		var healthMeter:HealthMeter = new HealthMeter();
+		var energyMeter:EnergyMeter = new EnergyMeter();
 		
 		// attack zones
 		public var attacks = new Array();
 		public var isAttacking:Boolean = false;
+		
+		// stats
+		public var HP:int     = 0;
+		public var ATK:int    = 0;
+		public var ENATK:int  = 0;
+		public var SPD:int    = 0;
+		public var ENERGY:int = 0;
 		
 		public function Player(x:int, y:int, index:int) {
 			jumpJuice = 0;
@@ -69,7 +80,11 @@
 				stage.addEventListener(KeyboardEvent.KEY_DOWN, KeyDown);
 				stage.addEventListener(KeyboardEvent.KEY_UP, KeyUp)
 			
-				if(index == 1) parent.addChild(healthMeter);
+				if(index == 1) {
+					parent.addChild(healthMeter);
+					parent.addChild(energyMeter);
+					energyMeter.y += 15;
+				}
 			}
 		}
 		
@@ -110,6 +125,22 @@
 			healthMeter.Update(health, maxHealth);
 		}
 		
+		public function Drain(amount:int):void{
+			if(index == 1 && hurtTimer <= 0){
+				hurtTimer = hurtTimerMax;
+				energy -= amount;
+				if(energy < 0) energy = 0;
+				energyMeter.Update(energy, maxEnergy);
+			}
+		}
+		
+		public function Restore(amount:int):void{
+			energy += amount;
+			if(energy > maxEnergy) energy = maxEnergy;
+			
+			healthMeter.Update(energy, maxEnergy);
+		}
+		
 		private function Jump(){
 			jumpJuice = jumpJuiceMax;
 			speedY = -maxSpeedY;
@@ -133,13 +164,20 @@
 		
 		public function Update1(dt:Number, level:Level):void{
 			if(hurtTimer >= 0) hurtTimer -= dt;
+			regeneration += maxEnergy * 1 * dt;
+			if(regeneration > 1){
+				regeneration--;
+				energy++;
+				energyMeter.Update(energy, maxEnergy);
+				if(energy > maxEnergy-1) energy = maxEnergy-1;
+			}
 			
 			if(Keys.Left){
 				scaleX = 1;
-				speedX -= a * dt;
+				speedX -= a * dt * speedMultiplier;
 			}else if(Keys.Right){
 				scaleX = -1;
-				speedX += a * dt;
+				speedX += a * dt * speedMultiplier;
 				
 			}else{
 				speedX *= .8;
@@ -185,21 +223,15 @@
 			isAttacking = false;
 			if(Keys.OnPress("Attack1")){
 				if(hasBuzzsaw)
-					GenerateForwardAttackField();
+					GenerateLateralAttackField();
 				else
 					GenerateBasicAttackField();
-				isAttacking = true;
-				//trace("DEBUG: Attack1 pushed");
 			}
 			else if(Keys.OnPress("Energy1")){
 				GenerateFrontalAttackField();
-				isAttacking = true;
-				trace("DEBUG: Energy1 pushed");
 			}
 			else if(Keys.OnPress("Energy2")){
 				GenerateRadialAttackField();
-				isAttacking = true;
-				trace("DEBUG: Energy2 pushed");
 			}
 			// End attack logic
 			
@@ -319,79 +351,97 @@
 			ph = Config.TileSize;
 			
 			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+			isAttacking = true;
 		}
 		
-		public function GenerateForwardAttackField():void{
+		public function GenerateLateralAttackField():void{
 			attacks = new Array();
-			var px;
-			var py;
-			var pw;
-			var ph;
-			
-			if(Keys.FacingLeft)
-				px = -(Config.TileSize * 0.5);
-			else
-				px = (Config.TileSize * 0.5);
-			py = 0;
-			pw = Config.TileSize * 4;
-			ph = Config.TileSize;
-			
-			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+			if(energy >= 20){
+				energy -= 20;
+				attacks = new Array();
+				var px;
+				var py;
+				var pw;
+				var ph;
+				
+				if(Keys.FacingLeft)
+					px = -(Config.TileSize * 0.5);
+				else
+					px = (Config.TileSize * 0.5);
+				py = 0;
+				pw = Config.TileSize * 4;
+				ph = Config.TileSize;
+				
+				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+				isAttacking = true;
+			}
+			energyMeter.Update(energy, maxEnergy);
 		}
 		
 		public function GenerateFrontalAttackField():void{
 			attacks = new Array();
-			var px;
-			var py;
-			var pw;
-			var ph;
-			
-			if(Keys.FacingLeft)
-				px = -(Config.TileSize * 0.5);
-			else
-				px = (Config.TileSize * 0.5);
-			py = 0;
-			pw = Config.TileSize * 2;
-			ph = Config.TileSize * 3;
-			
-			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+			if(energy >= 35){
+				energy -= 35;
+				attacks = new Array();
+				var px;
+				var py;
+				var pw;
+				var ph;
+				
+				if(Keys.FacingLeft)
+					px = -(Config.TileSize * 0.5);
+				else
+					px = (Config.TileSize * 0.5);
+				py = 0;
+				pw = Config.TileSize * 2;
+				ph = Config.TileSize * 3;
+				
+				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+				isAttacking = true;
+			}
+			energyMeter.Update(energy, maxEnergy);
 		}
 		
 		public function GenerateRadialAttackField():void{
 			attacks = new Array();
-			var px;
-			var py;
-			var pw;
-			var ph;
-			
-			px = 0;
-			py = 0;
-			pw = Config.TileSize * 3;
-			ph = Config.TileSize * 3;
-			
-			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
-			
-			px = 0;
-			py = (-Config.TileSize * 2);
-			pw = Config.TileSize;
-			ph = Config.TileSize;
-			
-			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
-			
-			px = 0;
-			py = -py;
-			
-			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
-			
-			px = (-Config.TileSize * 2);
-			py = 0;
-			
-			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
-			
-			px = -px;
-			py = 0;
-			
-			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+			if(energy >= 50){
+				energy -= 50;
+				var px;
+				var py;
+				var pw;
+				var ph;
+				
+				px = 0;
+				py = 0;
+				pw = Config.TileSize * 3;
+				ph = Config.TileSize * 3;
+				
+				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+				
+				px = 0;
+				py = (-Config.TileSize * 2);
+				pw = Config.TileSize;
+				ph = Config.TileSize;
+				
+				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+				
+				px = 0;
+				py = -py;
+				
+				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+				
+				px = (-Config.TileSize * 2);
+				py = 0;
+				
+				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+				
+				px = -px;
+				py = 0;
+				
+				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+				isAttacking = true;
+			}
+			energyMeter.Update(energy, maxEnergy);
 		}
 	}
 }
