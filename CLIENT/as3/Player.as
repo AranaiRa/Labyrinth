@@ -164,7 +164,7 @@
 		
 		public function Update1(dt:Number, level:Level):void{
 			if(hurtTimer >= 0) hurtTimer -= dt;
-			regeneration += maxEnergy * 1 * dt;
+			regeneration += maxEnergy * 0.6 * dt;
 			if(regeneration > 1){
 				regeneration--;
 				energy++;
@@ -335,6 +335,7 @@
 			aabb.Update(worldX, worldY);
 		}
 		
+		// Loads the player's attacks array for a basic attack. Replaced by the buzzsaw.
 		public function GenerateBasicAttackField():void{
 			attacks = new Array();
 			var px;
@@ -350,10 +351,11 @@
 			pw = Config.TileSize * 2;
 			ph = Config.TileSize;
 			
-			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+			attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph, ATK));
 			isAttacking = true;
 		}
 		
+		// Loads the player's attacks array for a lateral attack. Costs 20 Energy.
 		public function GenerateLateralAttackField():void{
 			attacks = new Array();
 			if(energy >= 20){
@@ -372,12 +374,13 @@
 				pw = Config.TileSize * 4;
 				ph = Config.TileSize;
 				
-				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph, ATK));
 				isAttacking = true;
 			}
 			energyMeter.Update(energy, maxEnergy);
 		}
 		
+		// Loads the player's attacks array for a frontal attack. Costs 35 Energy.
 		public function GenerateFrontalAttackField():void{
 			attacks = new Array();
 			if(energy >= 35){
@@ -396,12 +399,13 @@
 				pw = Config.TileSize * 2;
 				ph = Config.TileSize * 3;
 				
-				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph, ATK));
 				isAttacking = true;
 			}
 			energyMeter.Update(energy, maxEnergy);
 		}
 		
+		// Loads the player's attacks array for a radial attack. Costs 50 Energy.
 		public function GenerateRadialAttackField():void{
 			attacks = new Array();
 			if(energy >= 50){
@@ -416,29 +420,29 @@
 				pw = Config.TileSize * 3;
 				ph = Config.TileSize * 3;
 				
-				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph, ATK));
 				
 				px = 0;
 				py = (-Config.TileSize * 2);
 				pw = Config.TileSize;
 				ph = Config.TileSize;
 				
-				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph, ATK));
 				
 				px = 0;
 				py = -py;
 				
-				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph, ATK));
 				
 				px = (-Config.TileSize * 2);
 				py = 0;
 				
-				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph, ATK));
 				
 				px = -px;
 				py = 0;
 				
-				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph));
+				attacks.push(new PlayerAttack(worldX + px, worldY + py, pw, ph, ATK));
 				isAttacking = true;
 			}
 			energyMeter.Update(energy, maxEnergy);
