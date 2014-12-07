@@ -7,7 +7,7 @@ var Game = require("./Game.js").Game;
 global.Config = {
 	gravity:2,
 	tick:33,
-	BROADCASTIP: "10.0.0.10", //"10.252.20.249",//
+	BROADCASTIP: "10.0.0.255", //"10.252.20.249",//
 	SERVERPORT:1236,
 	CLIENTPORT:4326,
 	tileSize:64,

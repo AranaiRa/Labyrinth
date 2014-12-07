@@ -35,14 +35,14 @@ exports.Socket = function(){
 			case Protocol.HOST_LOBBY:
 				if(!player.hosting){
 					var roomID = ++global.Labyrinth.roomID;
-					console.log("Player " + player.id + " created room " + roomID);
+					console.log("Player " + player.rinfo.address + " created room " + roomID);
 					player.hosting = true;
 					global.Labyrinth.gamelist.push(new Game(roomID));
 					var gameInstance = global.Labyrinth.gamelist[roomID];
 					gameInstance.AddPlayer(player, 0);
 					me.SendJoinAccept(player, roomID, 0);
 					me.SendLobbyState(gameInstance);
-					//if(roomID == 1) me.Update();
+					if(roomID == 1) me.Update();
 				}else{
 					// something went wrong;
 					// server thought this player was hosting already but they sent another host request
@@ -63,7 +63,7 @@ exports.Socket = function(){
 				}else{
 					gameInstance.AddPlayer(player, emptyIndex);
 
-					console.log("Player " + player.id + " wants to join room " + roomID + "in seat " + emptyIndex);
+					console.log("Player " + player.rinfo.address + " wants to join room " + roomID + "in seat " + emptyIndex);
 					me.SendJoinAccept(player, roomID, emptyIndex);
 					me.SendLobbyState(gameInstance);
 				}
@@ -144,12 +144,13 @@ exports.Socket = function(){
 	this.BroadcastLobbyList = function(){
 
 		var numOpenLobbies = 0;
-		for(var i = 1; i < global.Labyrinth.gamelist.length + 1; i++){
+		for(var i = 0; i < global.Labyrinth.gamelist.length; i++){
 			var gameInstance = global.Labyrinth.gamelist[i];
-			if(gameInstance.players.fullSeats < 8 && !global.Labyrinth.gamelist[i].started){
+			if(gameInstance != null && gameInstance.fullSeats < 8 && !gameInstance.started){
 				numOpenLobbies++;
 			}
 		}
+
 		var hb = 2; // header bytes; static; same length for every packet
 		var vb = 2; // variable bytes; nonstatic; bytes per object in loop
 		var len = hb + vb * numOpenLobbies;
@@ -157,11 +158,15 @@ exports.Socket = function(){
 		var buff = new Buffer(len);
 		buff.writeUInt8(Protocol.BROADCAST_LOBBY_LIST, 0);
 		buff.writeUInt8(numOpenLobbies, 1);
+		
+		var i2 = 0;
 		for(var i = 1; i < global.Labyrinth.gamelist.length + 1; i++){
 			var gameInstance = global.Labyrinth.gamelist[i];
-			if(gameInstance.players.fullSeats < 8 && !gameInstance.started){
-				buff.writeUInt8(gameInstance.id, 2 + i*vb);
-				buff.writeUInt8(gameInstance.fullSeats, 3 + i*vb);
+			if(gameInstance != null && gameInstance.fullSeats < 8 && !gameInstance.started){
+				buff.writeUInt8(gameInstance.id, 2 + i2*vb);
+				buff.writeUInt8(gameInstance.fullSeats, 3 + i2*vb);
+				console.log("Valid game found: " + gameInstance.id + ", full seats: " + gameInstance.fullSeats);
+				i2++;
 			}
 		}
 

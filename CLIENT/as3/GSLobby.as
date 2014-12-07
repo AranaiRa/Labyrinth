@@ -29,6 +29,7 @@
 				waitingForHost.visible = false;
 			}else{
 				name1.text = "Player 1 (Host)";
+				nameTexts[playerID].text = "Player " + (playerID + 1) + " (You)";
 				bttnStart.visible = false;
 			}
 			
