@@ -1,5 +1,5 @@
 ﻿package as3 {
-	import flashx.textLayout.formats.Float;
+
 	import flash.geom.Point;
 	
 	public class GSPlay extends GameState {
@@ -12,13 +12,11 @@
 		
 		var players:Array = new Array();
 		var attacks:Array = new Array();
-		var spawns:Array = new Array();
+		var spawners:Array = new Array();
 		var enemies:Array = new Array();
 		var pickups:Array = new Array();
 		
 		var roundTimer:Number = 30;
-		var wait:Number = 1; // how long to wait before beginning updates, to fix dt
-		
 		
 
 		public function GSPlay(gsm:GameStateManager) {
@@ -26,219 +24,157 @@
 			
 			cam = new Camera();
 			player = new Player(Config.StageWidth/2, Config.StageHeight/2, 1);
-			player2 = new Player(Config.StageWidth/2, Config.StageHeight, 2);
+			
 			players.push(player);
-			players.push(player2);
-			
-			SpawnPlayer(player);
-			SpawnPlayer(player2);
-			
-			GenerateEnemySpawner();
-			//enemies.push(new EnemyHopper(Config.StageWidth/3, Config.StageHeight/2));
-			//enemies.push(new EnemyTurret(Config.StageWidth/3, Config.StageHeight/2));
-			enemies.push(new EnemyRanger(Config.StageWidth/3, Config.StageHeight/2));
-			
+
+			//addChildAt(level, Layer.LEVELBG);
 			addChild(level);
 			
 			for(var i:int = players.length-1; i >= 0; i--){
+				//addChildAt(players[i], Layer.PLAYER);
 				addChild(players[i]);
 			}
 			
-			for(var i:int = spawns.length-1; i >= 0; i--){
-				addChild(spawns[i]);
+			for(var i:int = spawners.length-1; i >= 0; i--){
+				//addChildAt(spawners[i], Layer.SPAWNER);
+				addChild(spawners[i]);
 			}
 			
 			for(var i:int = enemies.length-1; i >= 0; i--){
+				//addChildAt(enemies[i], Layer.ENEMY);
 				addChild(enemies[i]);
 			}
 			
 			Config.timer.start();
-			level.GetValidSpawnLocation();
+		}
+		
+		public function ReceiveWorldstatePlayer(pID:uint, px:Number, py:Number):void{
+			if(players.length > 0 && players[pID] != null){
+				players[pID].worldX = px;
+				players[pID].worldY = py;
+			}
+		}
+
+		public function UpdateStats(hp:uint, maxhp:uint, energy:uint, maxenergy:uint):void{
+			player.UpdateStats(hp, maxhp, energy, maxenergy);		
+		}
+
+		public function AddEnemy(eType:uint):void{ // tell it what index to be at??
+			var e:Enemy;
+			switch(eType){
+				case Enemy.TURRET:
+					//e = new EnemyTurret();
+				break;
+				case Enemy.HOPPER:
+					e = new EnemyHopper();
+				break;
+				case Enemy.AERIAL:
+					//e = new EnemyAerial();
+				break;
+				case Enemy.RANGER:
+					//e = new EnemyRanger();
+				break;
+				case Enemy.BULLET:
+					//e = new EnemyBullet();
+				break;
+			}
+			
+			if(e == null){
+				return;
+			}
+			//addChildAt(e, Layer.ENEMY);
+			addChild(e);
+			enemies.push(e);
+		}
+
+		public function RemoveEnemy(eID:uint):void{
+			var e:Enemy = enemies[eID];
+			if(e == null){
+				trace("Attempted to remove an enemy that doesn't exist...");
+				return;
+			}
+			removeChild(e);
+			enemies.splice(eID, 1);
+		}
+
+		public function ReceiveWorldstateEnemy(pID:uint, playerID:uint, px:Number, py:Number):void{
+			if(enemies[pID] == null){
+				trace("Attempted to update a null enemy");
+				return;
+			}
+			enemies[pID].targetPlayer = players[playerID];
+			enemies[pID].worldX = px;
+			enemies[pID].worldY = py;
+		}
+
+		public function ReceiveWorldstateSpawner(pID:uint, px:Number, py:Number):void{
+			if(spawners[pID] == null){
+				spawners.push(new EnemySpawner(px, py));
+				//addChildAt(spawners[pID], Layer.ENEMY);
+				addChild(spawners[pID]);
+			}else{
+				spawners[pID].worldX = px;
+				spawners[pID].worldY = py;
+			}
+		}
+
+		public function AddPickup(pType:uint, pAmount:uint):void{
+			var p:Pickup = new Pickup(pType, pAmount);
+			//addChildAt(p, Layer.PICKUP);
+			addChild(p);
+			pickups.push(p);
+		}
+
+		public function RemovePickup(pID:uint):void{
+			var p:Pickup = pickups[pID];
+			if(p == null){
+				trace("Attempted to remove a pickup that doesn't exist...");
+				return;
+			}
+			removeChild(p);
+			pickups.splice(pID, 1);
+		}
+
+		public function ReceiveWorldstatePickups(pID:uint, px:Number, py:Number):void{
+			if(pickups[pID] == null){
+				trace("Attempted to update a null pickup");
+				return;
+			}
+			pickups[pID].worldX = px;
+			pickups[pID].worldY = py;
 		}
 		
 		public override function Update():void{
-			var dt:Number = .05;
-			if(wait < 0){
-				for(var i:int = 0; i < players.length; i++){
-					players[i].Update(dt, cam, level);
-					if(players[i].index == 1) cam.Update(player.worldX, player.worldY);
-				}
-				level.Update(cam);
-				
-				// put in players loop
-				if(player.health <= 0){
-					SpawnPlayer(player);
-				}
-				
-				// put in players loop
-				attacks = new Array();
-				if(player.isAttacking){
-					for(var i:int = 0; i < player.attacks.length; i++){
-						trace("Attack added to array");
-						attacks.push(player.attacks[i]);
-						addChild(player.attacks[i]);
-					}
-				}
-				
-				// update enemies
-				for(var i:int = enemies.length-1; i >=0; i--){
-					var e:Enemy = enemies[i];
-					e.Update(dt, cam, player);					
-					
-					// check for bullets
-					if(e.bullet != null){
-						enemies.push(e.bullet);
-						addChild(e.bullet);
-						e.bullet = null;
-					}
-					
-					// put in players loop
-					if(e.aabb.IsCollidingWith(player.aabb) && e.hurtOnContact){
-						player.Hurt(e.damage);
-						if(e is EnemyBullet){
-							KillEnemy(i);
-							continue;
-						}
-					}
-				
-					//check player attack fields
-					// put in players loop
-					//for(var i:int = 0; i < players.length; i++){
-						for(var af:int = 0; af < attacks.length; af++){
-							attacks[af].Update(cam);
-							
-							if(e.aabb.IsCollidingWith(attacks[af].aabb)){
-								trace("  }- Have some pain! :D");
-								
-								if(!(e is EnemyBullet)){
-									KillEnemy(i);
-									continue;
-								}
-							}
-							else{
-								//trace("  }- Missed. :c");
-							}
-						}
-					//}
-					
-					// bullet culling
-					if(e is EnemyBullet){
-						var epos:Point = new Point(e.worldX, e.worldY);
-						var tooFar:Boolean = true;
-						// put in players loop
-						var ppos:Point = new Point(player.worldX, player.worldY);
-						if(Point.distance(epos, ppos) < 1500){
-							tooFar = false;
-							//break;
-						}
-						if(tooFar){
-							enemies.splice(i,1);
-							continue;
-						}
-					}
-				}
-				
-				// put in players loop
-				for(var i:int = spawns.length-1; i >=0; i--){
-					var spawn:EnemySpawner = spawns[i];
-					spawn.Update(cam);
-					if(spawn.aabb.IsCollidingWith(player.aabb)){
-						ActivateSpawner(i);
-					}
-				}
-				
-				// put in players loop
-				for(var i:int = pickups.length-1; i >=0; i--){
-					var pickup:Pickup = pickups[i];
-					pickup.Update(dt, cam);
-					if(pickup.canPickup && pickup.aabb.IsCollidingWith(player.aabb)){
-						GetPickup(i);
-					}
-				}
-			}else{
-				wait -= dt;
+
+			// update your player and camera
+			player.Update(cam);
+			cam.Update(player.worldX, player.worldY);
+
+			// update level
+			level.Update(cam);
+
+			// update other players
+			for(var i:int = 0; i < players.length; i++){
+				if(players[i].index != 1) players[i].Update(cam);
 			}
-		}
-		
-		public function SpawnPlayer(p:Player):void{
-			trace("spawning player "+p.index);
-			trace("lives: "+p.lives);
-			p.lives--;
-			if(p.lives >= 0){
-				p.health = p.maxHealth;
-				var pos:Point = level.GetValidSpawnLocation();
-				p.worldX = pos.x;
-				p.worldY = pos.y;
-			}
-			else{
-				trace("Hey, uh, maybe player "+p.index+" should be dead?");
-			}
-		}
-		
-		public function GenerateEnemySpawner():void{
-			var pos:Point = level.GetValidSpawnLocation();
-			spawns.push(new EnemySpawner(pos.x, pos.y));
-		}
-		
-		public function KillEnemy(index:int):void{
-			var enemy:Enemy = enemies.splice(index, 1)[0];
-			if(!(enemy is EnemyBullet)){ // bullets don't drop pickups
-				var newPickups:Array = enemy.DropPickups();
-				for(var i:int = 0; i < newPickups.length; i++){
-					pickups.push(newPickups[i]);
-					addChild(newPickups[i]);
-				}
+						
+			// update enemies
+			for(var i:int = enemies.length-1; i >=0; i--){
+				var e:Enemy = enemies[i];
+				e.Update(cam, player);
 			}
 			
-			removeChild(enemy);
-		}
-		
-		public function GetPickup(index:int):void{
-			var pickup:Pickup = pickups.splice(index, 1)[0];
-				
-			switch(pickup.type){
-				case Pickup.HPUP:
-					player.AddHealth(pickup.amount);
-					player.HP += pickup.amount;
-					player.maxHealth += pickup.amount;
-					player.health += pickup.amount;
-				break;				
-				case Pickup.ATKUP:
-					player.AddHealth(pickup.amount);
-					player.ATK += pickup.amount;
-				break;
-				case Pickup.SPDUP:
-					player.AddHealth(pickup.amount);
-					player.SPD += pickup.amount;
-					player.speedMultiplier += (pickup.amount / 100.0);
-				break;
-				case Pickup.ENERGYUP:
-					player.AddHealth(pickup.amount);
-					player.ENERGY += pickup.amount;
-					player.maxEnergy += pickup.amount;
-					player.energy += pickup.amount;
-				break;
+			// update spawners
+			for(var i:int = spawners.length-1; i >=0; i--){
+				var spawn:EnemySpawner = spawners[i];
+				spawn.Update(cam);
 			}
 			
-			trace("HP:"+player.HP+" EP:"+player.ENERGY+" ATT:"+player.ATK+" SPD:"+player.SPD);
-			
-			removeChild(pickup);
-		}
-		
-		public function ActivateSpawner(index:int):void{
-			//var spawn:EnemySpawner = spawns.splice(index, 1)[0];
-			var spawn:EnemySpawner = spawns[index];
-			
-			var newEnemies:Array = spawn.SpawnEnemies();
-			for(var i:int = 0; i < newEnemies.length; i++){
-				enemies.push(newEnemies[i]);
-				addChild(newEnemies[i]);
+			// update pickups
+			for(var i:int = pickups.length-1; i >=0; i--){
+				var pickup:Pickup = pickups[i];
+				pickup.Update(cam);
 			}
-			//removeChild(spawn);
-			
-			var posNew:Point = level.GetValidSpawnLocation();
-			spawn.worldX = posNew.x;
-			spawn.worldY = posNew.y;
 		}
 	}
 }

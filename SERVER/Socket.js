@@ -38,7 +38,8 @@ exports.Socket = function(){
 					console.log("Player " + player.id + " created room " + roomID);
 					player.hosting = true;
 					global.Labyrinth.gamelist.Add(new Game(roomID));
-					global.Labyrinth.gamelist.games[roomID].players.push(player);
+					//global.Labyrinth.gamelist.games[roomID].players.push(player);
+					global.Labyrinth.gamelist.games[roomID].AddPlayer(player);
 					me.SendJoinAccept(player, roomID);
 					if(roomID == 1) me.Update();
 				}else{
@@ -55,8 +56,21 @@ exports.Socket = function(){
 			case Protocol.START_GAME:
 				var roomID = buff.readUInt8(1);
 				me.SendStartAccept(roomID);
+				global.Labyrinth.Play(roomID);
 				break;
 			case Protocol.INPUT:
+				var flags = buff.readUInt8(1);
+				//console.log("flags: " + flags);
+				var Q = (flags & 64) > 0;
+				var W = (flags & 32) > 0;
+				var E = (flags & 16) > 0;
+
+				var P = (flags & 8) > 0;
+				var J = (flags & 4) > 0;
+				var L = (flags & 2) > 0;
+				var R = (flags & 1) > 0;
+
+				player.Keys.Update(Q, W, E, P, J, L, R);
 				break;
 			case Protocol.BROADCAST_LOBBY_LIST:
 				console.log("because it gets broadcasted so yknow.");
@@ -67,11 +81,11 @@ exports.Socket = function(){
 	});
 
 	this.socket.on("listening", function(){
-		console.log("listening on port " + global.Labyrinth.PORT);
+		console.log("listening on port " + global.Config.SERVERPORT);
 	});
 
 	this.Listen = function(){
-		this.socket.bind(global.Labyrinth.PORT);
+		this.socket.bind(global.Config.SERVERPORT);
 	};
 
 	this.Update = function(){
@@ -95,7 +109,7 @@ exports.Socket = function(){
 	}
 
 	this.Broadcast = function(buff){
-		var rinfo = {port:global.Labyrinth.CLIENTPORT, address:global.Labyrinth.BROADCASTIP};
+		var rinfo = {port:global.Config.CLIENTPORT, address:global.Config.BROADCASTIP};
 		//console.log("Attempting to broadcast data to " + rinfo.address + ":" + rinfo.port);
 		
 		me.socket.send(buff, 0, buff.length, rinfo.port, rinfo.address, function(err, bytes){
@@ -106,7 +120,7 @@ exports.Socket = function(){
 	//////////////////////////////////// SEND FUNCTIONS
 
 	this.BroadcastLobbyList = function(){
-		console.log("Broadcasting " + global.Labyrinth.gamelist.length + " lobbies.");
+		//console.log("Broadcasting " + global.Labyrinth.gamelist.length + " lobbies.");
 		var buff = new Buffer(2 + global.Labyrinth.gamelist.length*2);
 		buff.writeUInt8(Protocol.BROADCAST_LOBBY_LIST, 0);
 		buff.writeUInt8(global.Labyrinth.gamelist.length, 1);
@@ -135,39 +149,217 @@ exports.Socket = function(){
 		me.SendToPlayers(buff, global.Labyrinth.gamelist.games[roomID].players);
 	};
 
-	/*this.SendUpdate = function(){
-		var num = global.Labyrinth.game.players.length;
-		if(num <= 0) return;
+	/**************************************************
+	* Packet Type
+	* Number of Players
+	*   Player index
+	*   worldX
+	*   worldY
+	**************************************************/
+	this.SendWorldstatePlayers = function(gameInstance){
 
-		var len = 18 + 17 * num;
-		var x = 18;
+		var numPlayers = gameInstance.players.length;
+		var hb = 2; // header bytes; static; same length for every packet
+		var vb = 9; // variable bytes; nonstatic; bytes per object in loop
+
+		var len = hb + vb * numPlayers;
 		var buff = new Buffer(len);
-tc
-		buff.writeUInt32BE(Protocol.id, 0);
-		buff.writeUInt8(Protocol.MSG_UPDATE, 4);
-		buff.writeUInt32BE(0, 5);  // server seq#
-		buff.writeUInt32BE(0, 13); // ack bitfield
-		buff.writeUInt8(num, 17);
-		global.Labyrinth.game.players.Loop(function(){
-			var ps = this.getPrevState();
-			buff.writeUInt8(this.id, x);
-			buff.writeFloatBE(ps.px, x+01);
-			buff.writeFloatBE(ps.py, x+05);
-			buff.writeFloatBE(ps.vx, x+09);
-			buff.writeFloatBE(ps.vy, x+13);
-			x += 17;
-		});
-		global.Labyrinth.game.players.Loop(function(){
-			if(this.hasSentInput){
-				var pc = this.getPrevCommand();
-				var seq = (pc == null) ? 0 : pc.seq;
-				buff.writeUInt32BE(seq, 9)
-				me.Send(buff, this.rinfo);
-			} else {
-				me.sendConnect(this);
+
+		// header bytes
+		buff.writeUInt8(Protocol.WORLDSTATE_PLAYERINFO, 0);
+		buff.writeUInt8(numPlayers, 1);
+
+		// variable bytes
+		for(var i = 0; i < numPlayers; i++){
+			buff.writeUInt8(i, 2 + i*vb);
+			buff.writeFloatBE(gameInstance.players[i].worldX, 3 + i*vb);
+			buff.writeFloatBE(gameInstance.players[i].worldY, 7 + i*vb);
+
+			//console.log("Player " + i + " is at (" + gameInstance.players[i].worldX + ", " + gameInstance.players[i].worldY + ")");
+		}
+
+		this.SendToPlayers(buff, gameInstance.players);
+	};
+
+	/**************************************************
+	* Packet Type: STAT_UPDATE
+	* Current HP
+	* Total HP
+	* Current Energy
+	* Total Energy
+	**************************************************/
+	this.SendStats = function(player){
+		var len = 9;
+		var buff = new Buffer(len);
+
+		buff.writeUInt8(Protocol.STAT_UPDATE, 0);
+		buff.writeUInt16BE(player.health, 1);
+		buff.writeUInt16BE(player.maxHealth, 3);
+		buff.writeUInt16BE(player.energy, 5);
+		buff.writeUInt16BE(player.maxEnergy, 7);
+
+		me.Send(buff, player.rinfo);
+	};
+
+	/**************************************************
+	* Packet Type: ADD_ENEMY
+	* Enemy Type
+	**************************************************/
+	this.SendAddEnemy = function(gameInstance, eType){
+		var len = 2;
+		var buff = new Buffer(len);
+
+		buff.writeUInt8(Protocol.ADD_ENEMY, 0);
+		buff.writeUInt8(eType, 1);
+		this.SendToPlayers(buff, gameInstance.players);
+	};
+
+
+	/**************************************************
+	* Packet Type: REMOVE_ENEMY
+	* Enemy ID
+	**************************************************/
+	this.SendRemoveEnemy = function(gameInstance, eID){
+		var len = 2;
+		var buff = new Buffer(len);
+
+		buff.writeUInt8(Protocol.REMOVE_ENEMY, 0);
+		buff.writeUInt8(eID, 1);
+		this.SendToPlayers(buff, gameInstance.players);
+	};
+
+	/**************************************************
+	* Packet Type: WORLDSTATE_ENEMYINFO
+	* Number of Enemies
+	*   Enemy index
+	*	Target player ID
+	*   worldX
+	*   worldY
+	**************************************************/
+	this.SendWorldstateEnemies = function(gameInstance){
+
+		var numEnemies = gameInstance.enemies.length;
+		var hb = 2; // header bytes; static; same length for every packet
+		var vb = 10; // variable bytes; nonstatic; bytes per object in loop
+
+		var len = hb + vb * numEnemies;
+		var buff = new Buffer(len);
+
+		// header bytes
+		buff.writeUInt8(Protocol.WORLDSTATE_ENEMYINFO, 0);
+		buff.writeUInt8(numEnemies, 1);
+
+		// variable bytes
+		for(var i = 0; i < numEnemies; i++){
+			buff.writeUInt8(i, 2 + i*vb);
+			buff.writeUInt8(gameInstance.enemies[i].targetPlayerID, 3 + i*vb);
+			buff.writeFloatBE(gameInstance.enemies[i].worldX, 4 + i*vb);
+			buff.writeFloatBE(gameInstance.enemies[i].worldY, 8 + i*vb);
+
+			//console.log("enemy " + i + " is at (" + gameInstance.enemies[i].worldX + ", " + gameInstance.enemies[i].worldY + ")");
+		}
+
+		this.SendToPlayers(buff, gameInstance.players);
+	};
+
+	/**************************************************
+	This only runs at gamestart and when spawners are activated, to show new spawners.
+	* Packet Type: WORLDSTATE_SPAWNERINFO
+	* Number of Spawners
+	*   Spawner index
+	*   worldX
+	*   worldY
+	**************************************************/
+	this.SendWorldstateSpawners = function(gameInstance){
+
+		var numSpawners = gameInstance.spawners.length;
+		var hb = 2; // header bytes; static; same length for every packet
+		var vb = 9; // variable bytes; nonstatic; bytes per object in loop
+
+		var len = hb + vb * numSpawners;
+		var buff = new Buffer(len);
+
+		// header bytes
+		buff.writeUInt8(Protocol.WORLDSTATE_SPAWNERINFO, 0);
+		buff.writeUInt8(numSpawners, 1);
+
+		// variable bytes
+		for(var i = 0; i < numSpawners; i++){
+			buff.writeUInt8(i, 2 + i*vb);
+			buff.writeFloatBE(gameInstance.spawners[i].worldX, 3 + i*vb);
+			buff.writeFloatBE(gameInstance.spawners[i].worldY, 7 + i*vb);
+		}
+
+		this.SendToPlayers(buff, gameInstance.players);
+	};
+
+	/**************************************************
+	* Packet Type: ADD_PICKUP
+	* Pickup Type
+	* Pickup Amount
+	**************************************************/
+	this.SendAddPickup = function(gameInstance, pType, pAmount){
+		var len = 3;
+		var buff = new Buffer(len);
+
+		buff.writeUInt8(Protocol.ADD_PICKUP, 0);
+		buff.writeUInt8(pType, 1);
+		buff.writeUInt8(pAmount, 2);
+		this.SendToPlayers(buff, gameInstance.players);
+	};
+
+
+	/**************************************************
+	* Packet Type: REMOVE_PICKUP
+	* Pickup ID
+	**************************************************/
+	this.SendRemovePickup = function(gameInstance, pID){
+		var len = 2;
+		var buff = new Buffer(len);
+
+		buff.writeUInt8(Protocol.REMOVE_PICKUP, 0);
+		buff.writeUInt8(pID, 1);
+		this.SendToPlayers(buff, gameInstance.players);
+	};
+
+
+
+	/**************************************************
+	* Packet Type: WORLDSTATE_PICKUPINFO
+	* Number of Moving Pickups (Static ones don't need to be sent anymore)
+	*   Pickup index
+	*   worldX
+	*   worldY
+	**************************************************/
+	this.SendWorldstatePickups = function(gameInstance){
+
+		var numPickups = gameInstance.pickups.length;
+
+		var numMoving = 0;
+		for(var i = 0; i < numPickups; i++){
+			if(gameInstance.pickups[i].moving) numMoving++;
+		}
+		var hb = 2; // header bytes; static; same length for every packet
+		var vb = 9; // variable bytes; nonstatic; bytes per object in loop
+
+		var len = hb + vb * numMoving;
+		var buff = new Buffer(len);
+
+		// header bytes
+		buff.writeUInt8(Protocol.WORLDSTATE_PICKUPINFO, 0);
+		buff.writeUInt8(numMoving, 1);
+
+		// variable bytes
+		var iMoving = 0;
+		for(var i = 0; i < numPickups; i++){
+			if(gameInstance.pickups[i].moving){
+				buff.writeUInt8(i, 2 + iMoving*vb);
+				buff.writeFloatBE(gameInstance.pickups[i].worldX, 3 + iMoving*vb);
+				buff.writeFloatBE(gameInstance.pickups[i].worldY, 7 + iMoving*vb);
+				iMoving++;
 			}
-		});
+		}
 
-	};*/
-
+		this.SendToPlayers(buff, gameInstance.players);
+	};
 };

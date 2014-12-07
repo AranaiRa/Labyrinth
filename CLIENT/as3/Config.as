@@ -12,7 +12,6 @@
 		static var StageTop:int = 0;
 		static var StageRight:int = 800;
 		static var Ground:int = 550;
-		static var TileSize:int = 64;
 		
 		static var Gravity:Number = 2;
 		

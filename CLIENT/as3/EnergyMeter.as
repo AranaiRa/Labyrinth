@@ -8,7 +8,7 @@
 		
 		public function EnergyMeter() {
 			this.x = 20;
-			this.y = 20;
+			this.y = 55;
 			this.bar = barInstance;
 		}
 		

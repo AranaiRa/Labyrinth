@@ -17,7 +17,7 @@ exports.GameList = function(){
 	// so you can use the object like an array, but rather than index, looks at rinfo to see if it matches
 	this.Get = function(index){
 		for(key in this.games){
-			if(this.games[key].MatchesAddr(index)) {
+			if(this.games[key].id == index) {
 				return this.games[key];
 			}
 		}

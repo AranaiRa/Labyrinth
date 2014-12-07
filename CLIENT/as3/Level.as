@@ -6,14 +6,15 @@
 	public class Level extends MovieClip{
 
 		var levelData:LevelData = new LevelData();
-		var size:uint = Config.TileSize;
+		var size:uint = 64; //tile size
 		var grid:Array;
 		var tiles:Array;
 		
 		public function Level() {
 			grid = new Array(levelData.width);
 			tiles = new Array();
-			trace("w:"+levelData.width+" h:"+levelData.height);
+			var levelString:String = "";
+			
 			for (var i:uint = 0; i < levelData.width; i++){
 				grid[i] = new Array();
 				for (var j:uint = 0; j < levelData.height; j++){
@@ -28,6 +29,14 @@
 					}
 				} // end j loop
 			} // end i loop
+			
+			for (var i:uint = 0; i < levelData.width; i++){
+					levelString += "\n";
+				for (var j:uint = 0; j < levelData.height; j++){
+					levelString += (", " + grid[j][i]);
+				}
+			}
+			//trace(levelString);
 		} 
 		
 		public function Update(cam:Camera):void{
@@ -52,47 +61,10 @@
 
 			return (grid[px][py] > 0);
 		}
-		
-		public function FixCollisions(player:Player):Boolean {
 
-			var collision:Boolean = false;
-			
-			var minX:int = WorldToGrid(player.aabb.Left);
-			var maxX:int = WorldToGrid(player.aabb.Right);
-			var minY:int = WorldToGrid(player.aabb.Top);
-			var maxY:int = WorldToGrid(player.aabb.Bottom);
-
-			for (var py:int = minY; py <= maxY; py++) {
-				for (var px:int = minX; px <= maxX; px++) {
-					if (CheckCollisionAt(px, py)) {
-						// solve for collision
-						collision = true;
-
-						var omitTop:Boolean = false;
-						var omitLeft:Boolean = false;
-						var omitRight:Boolean = false;
-						var omitBottom:Boolean = false;
-
-						if (CheckCollisionAt(px, py - 1)) omitBottom = true;
-						if (CheckCollisionAt(px - 1, py)) omitLeft = true;
-						if (CheckCollisionAt(px + 1, py)) omitRight = true;
-						if (CheckCollisionAt(px, py + 1)) omitTop = true;
-
-						var aabb:AABB = new AABB(px * size, py * size, size, size);
-						aabb.Update(px*size, py*size);
-						player.FixCollisionWithStaticAABB(aabb, omitTop, omitRight, omitBottom, omitLeft);
-					}
-				}
-			}
-			if (!collision) {
-				player.grounded = false;
-			}
-
-			return collision;
-		}
-		
+		// gets random noncollision space
 		public function GetValidSpawnLocation():Point {
-			var d:Point = new Point(0,0);
+			var p:Point = new Point(0,0);
 			while(true){
 				var gx:int = int(Random.Range(1,levelData.width-1));
 				var gy:int = int(Random.Range(1,levelData.height-1));
@@ -100,11 +72,11 @@
 				if(grid[gx][gy] > 0)
 					continue;
 				else{
-					d = new Point(GridToWorld(gx), GridToWorld(gy));
+					p = new Point(GridToWorld(gx), GridToWorld(gy));
 					break;
 				}
 			}
-			return d;
+			return p;
 		}
 	}	
 }
