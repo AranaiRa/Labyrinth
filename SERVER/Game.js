@@ -9,7 +9,7 @@ exports.Game = function(gameID){
 
 	var me = this;
 	this.id = gameID;
-	this.players = [];
+	this.players = [null, null, null, null, null, null, null, null];
 	this.attacks = [];
 	this.spawners = [];
 	this.enemies = [];
@@ -18,9 +18,24 @@ exports.Game = function(gameID){
 	this.systime = Date.now(); // system time
 	this.time = 0; // game time
 	this.level = new Level();
+	this.fullSeats = 0;
 
-	this.AddPlayer = function(player){
-		me.players.push(player);
+	this.AddPlayer = function(player, index){
+		if(me.players[index] != null){
+			console.log("!!! Attempted to overwrite an existing player. what happened");
+		}else{
+			me.players[index] = player;
+			me.fullSeats++;
+		}
+	};
+
+	this.RemovePlayer = function(player, index){
+		if(me.players[index].MatchesAddr(player)){
+			me.players[index] = null;
+			me.fullSeats--;
+		}else{
+			console.log("!!! Attempted to remove the wrong player. what happened");
+		}
 	};
 
 	this.DisconnectPlayer = function(playerID){
@@ -29,7 +44,7 @@ exports.Game = function(gameID){
 			// TODO: broadcast disconnect to all other players
 			console.log("disconnect player (timeout)")
 		}else{
-			console.log("Failed to disconnect player: player doesn't exist");
+			console.log("!!! Failed to disconnect player: player doesn't exist");
 		}
 	};
 

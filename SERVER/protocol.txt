@@ -36,6 +36,7 @@ Client -> Server
 	============================
 	0	1	uint8 	Packet Type
 	1	1	uint8	Room ID
+	2	1	uint8	Player ID
 
 	LEAVE_LOBBY
 	O 	L 	Type 	Description
@@ -59,10 +60,10 @@ Server -> Client
 	BROADCAST_LOBBY_LIST
 	O 	L 	Type 	Description
 	============================
-	0	1	uint8 	Packet Type
-	1	1	uint8	Number of (Nonfull) Rooms
-	2n	1	uint8	Room ID
-	3n	1	uint8	Available Seats
+	0			1	uint8 	Packet Type
+	1			1	uint8	Number of (Nonfull, not started) Rooms
+	----------------------------
+	(2 + n)		1	uint8	Available Seats
 
 	LOBBY_FULL (Sent if a player tries to join a room but it becomes full before client notices)
 	O 	L 	Type 	Description
@@ -76,7 +77,7 @@ Server -> Client
 	1	1	uint8	Room ID
 	2	1	uint8	Full Seats (0 for empty, 1 for full) // bitfield
 
-	BROADCAST_LOBBY_STATE
+	LOBBY_STATE
 	O 	L 	Type 	Description
 	============================
 	0	1	uint8 	Packet Type

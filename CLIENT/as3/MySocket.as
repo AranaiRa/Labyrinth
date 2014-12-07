@@ -55,8 +55,13 @@
 				case Protocol.JOIN_ACCEPT:		
 					trace("packet received: join request accepted");
 					var roomID:uint = e.data.readUnsignedByte();
+					var playerID:uint = e.data.readUnsignedByte();
+					Main.gsm.SwitchToLobby(roomID, playerID);
+					break;
+				case Protocol.LOBBY_STATE:		
+					trace("packet received: update lobby seats");
 					var seatsFull:uint = e.data.readUnsignedByte();
-					Main.gsm.SwitchToLobby(roomID, seatsFull);
+					Main.gsm.UpdateLobby(seatsFull);
 					break;
 				case Protocol.START_ACCEPT:
 					Main.gsm.SwitchToPlay();

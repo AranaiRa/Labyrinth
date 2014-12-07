@@ -33,7 +33,7 @@ global.Random = {
 global.Labyrinth = {
 	roomID:0,
 	players:new PlayerList(),
-	gamelist:new GameList(),
+	gamelist:[null],
 	socket:new Socket(),
 	Start:function(){
 		this.socket.Listen();

@@ -22,6 +22,12 @@
 				(gsCurrent as GSJoin).ReceiveLobbyList(rooms, seats);
 			}
 		}
+
+		public function UpdateLobby(seatsFull:uint){
+			if(gsCurrent is GSLobby){
+				(gsCurrent as GSLobby).UpdateLobby(seatsFull);
+			}
+		}
 		
 		public function ReceiveWorldstatePlayer(pID:uint, px:Number, py:Number):void{
 			if(gsCurrent is GSPlay){
@@ -78,45 +84,45 @@
 		}
 
 	    public function SwitchToTitle():void {
-				if(gsCurrent != null) removeChild(gsCurrent);
-	      gsCurrent = new GSTitle(this);
-				addChild(gsCurrent);
+			if(gsCurrent != null) removeChild(gsCurrent);
+			gsCurrent = new GSTitle(this);
+			addChild(gsCurrent);
 	    }
 
-	    public function SwitchToLobby(roomID:uint, seatsFull:uint):void {
-				removeChild(gsCurrent);
-	      gsCurrent = new GSLobby(this, roomID, seatsFull, hosting);
-				addChild(gsCurrent);
+	    public function SwitchToLobby(roomID:uint, playerID:uint):void {
+			removeChild(gsCurrent);
+			gsCurrent = new GSLobby(this, roomID, playerID);
+			addChild(gsCurrent);
 	    }
 
 	    public function SwitchToJoin():void {
-				removeChild(gsCurrent);
-	      gsCurrent = new GSJoin(this);
-				addChild(gsCurrent);
+			removeChild(gsCurrent);
+			gsCurrent = new GSJoin(this);
+			addChild(gsCurrent);
 	    }
 
 	    public function SwitchToInstructions():void {
-				removeChild(gsCurrent);
-	      //gsCurrent = new GSInstructions(this);
-				addChild(gsCurrent);
+			removeChild(gsCurrent);
+			//gsCurrent = new GSInstructions(this);
+			addChild(gsCurrent);
 	    }
 
 	    public function SwitchToPlay():void {
-				if(gsCurrent != null) removeChild(gsCurrent);
-	      gsCurrent = new GSPlay(this);
-				addChild(gsCurrent);
+			if(gsCurrent != null) removeChild(gsCurrent);
+			gsCurrent = new GSPlay(this);
+			addChild(gsCurrent);
 	    }
 
 	    public function SwitchToEnd():void {
-				removeChild(gsCurrent);
-	     gsCurrent = new GSEnd(this);
-				addChild(gsCurrent);
+			removeChild(gsCurrent);
+			gsCurrent = new GSEnd(this);
+			addChild(gsCurrent);
 	    }
 
 	    public function SwitchToCredits():void {
-				removeChild(gsCurrent);
-	       gsCurrent = new GSCredits(this);
-				addChild(gsCurrent);
+			removeChild(gsCurrent);
+			gsCurrent = new GSCredits(this);
+			addChild(gsCurrent);
 	    }
 	}
 }

@@ -23,7 +23,7 @@
 			super(gsm);
 			
 			cam = new Camera();
-			player = new Player(Config.StageWidth/2, Config.StageHeight/2, 1);
+			player = new Player(1);
 			
 			players.push(player);
 

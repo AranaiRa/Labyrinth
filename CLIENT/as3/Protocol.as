@@ -26,5 +26,7 @@
 		public static var ADD_PICKUP:int = 21;
 		public static var REMOVE_PICKUP:int = 22;
 		public static var STAT_UPDATE:int = 23;
+
+		public static var LOBBY_STATE:int = 24; // server, move up later
 	}
 }

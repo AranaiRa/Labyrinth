@@ -5,22 +5,13 @@ var Game = require("./Game.js").Game;
 
 exports.GameList = function(){
 
-	this.games = {}; // object, but it's an associative array
+	this.games = []; // object, but it's an associative array
 	this.length = 0;
 	this.gameID = 0;
 
 	this.Get = function(index){
 		if(this.games.hasOwnProperty(index)) return this.games[index];
 		return null;
-	};
-
-	// so you can use the object like an array, but rather than index, looks at rinfo to see if it matches
-	this.Get = function(index){
-		for(key in this.games){
-			if(this.games[key].id == index) {
-				return this.games[key];
-			}
-		}
 	};
 	
 	this.Add = function(game){
@@ -38,17 +29,14 @@ exports.GameList = function(){
 		return game;
 	};
 
-	// can receive a game or index; if it receives a game, gets the index of that game
+	// receives game/room ID
 	this.Remove = function(index){
-		if(index instanceof Game) index = index.id;
-
-		// if the game is in that array, remove it
-		if(this.games.hasOwnProperty(index)) {
-			delete this.games[index]; // removes that 'property' from the object (removes game from the array)
+		// if the game is in the array, remove it
+		if(this.games[index] != null) {
+			this.games[index] = null;
 			this.length--;
-			return true;
 		}
-		console.log("failed");
+		console.log("Game was not in gamelist");
 		return false;
 	};
 

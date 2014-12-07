@@ -23,6 +23,7 @@ exports.Protocol = {
 	PLAY_ATTACK:20,
 	ADD_PICKUP:21,
 	REMOVE_PICKUP:22,
-	STAT_UPDATE:23
+	STAT_UPDATE:23,
 
+	LOBBY_STATE:24 // server, move up later
 };
