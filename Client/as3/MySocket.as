@@ -49,15 +49,9 @@
 						Main.gsm.ReceiveLobbyList(rooms, seats);
 					}
 					break;
-<<<<<<< HEAD
 				case Protocol.DENIED:
 					trace("packet received: lobby full or host left");
 					Main.gsm.SwitchToTitle();
-=======
-				// Lobby is full
-				case Protocol.LOBBY_FULL:
-					trace("packet received: lobby full error");
->>>>>>> origin/master
 					break;
 				// Join request accepted
 				case Protocol.JOIN_ACCEPT:		
