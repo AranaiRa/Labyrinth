@@ -4,10 +4,11 @@
 	
 	public class GSEnd extends GameState {
 		
-		public function GSEnd(gsm:GameStateManager) {
+		public function GSEnd(gsm:GameStateManager, winner:int) {
 			super(gsm);
 			
 			bttnLeave.addEventListener(MouseEvent.CLICK, leaveFunction);
+			winnerText.text = "Player "+winner;
 		}
 		
 		public function leaveFunction(e:MouseEvent):void{

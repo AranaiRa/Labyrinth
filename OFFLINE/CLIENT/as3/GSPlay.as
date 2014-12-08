@@ -204,13 +204,19 @@
 					player.health += pickup.amount;
 				break;				
 				case Pickup.ATKUP:
-					player.damageMultiplier += (pickup.amount / 100.0);
+					player.AddHealth(pickup.amount);
+					player.ATK += pickup.amount;
 				break;
 				case Pickup.SPDUP:
+					player.AddHealth(pickup.amount);
+					player.SPD += pickup.amount;
 					player.speedMultiplier += (pickup.amount / 100.0);
 				break;
 				case Pickup.ENERGYUP:
-					player.AddEnergy(pickup.amount);
+					player.AddHealth(pickup.amount);
+					player.ENERGY += pickup.amount;
+					player.maxEnergy += pickup.amount;
+					player.energy += pickup.amount;
 				break;
 			}
 			

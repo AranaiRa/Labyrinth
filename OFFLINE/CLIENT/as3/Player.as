@@ -38,13 +38,12 @@
 		var maxHealth:int = 100;
 		var energy:int = 100;
 		var maxEnergy:int = 100;
-
-		var damageMultiplier:Number = 1;
-		var speedMultiplier:Number = 1;
-		var regeneration:Number = 0;
-
 		var hurtTimer:Number = 0;
 		var hurtTimerMax:Number = 1.5;
+		var damageMultiplier:Number = 1;
+		var energyMultiplier:Number = 1;
+		var speedMultiplier:Number = 1;
+		var regeneration:Number = 0;
 		
 		// ui
 		var healthMeter:HealthMeter = new HealthMeter();
@@ -53,6 +52,13 @@
 		// attack zones
 		public var attacks = new Array();
 		public var isAttacking:Boolean = false;
+		
+		// stats
+		public var HP:int     = 0;
+		public var ATK:int    = 0;
+		public var ENATK:int  = 0;
+		public var SPD:int    = 0;
+		public var ENERGY:int = 0;
 		
 		public function Player(x:int, y:int, index:int) {
 			jumpJuice = 0;
@@ -99,15 +105,6 @@
 			// TODO: Add text to health bar?
 		}
 		
-		public function AddEnergy(amount:int):void{
-			// add energy proportionally
-			var percentage:Number = energy/maxEnergy;
-			maxEnergy += amount;
-			energy = Math.ceil(maxEnergy * percentage);
-			healthMeter.Update(energy, maxEnergy);
-			// TODO: Add text to energy bar?
-		}
-		
 		public function Hurt(amount:int):void{
 			if(index == 1 && hurtTimer <= 0){
 				hurtTimer = hurtTimerMax;
@@ -126,6 +123,22 @@
 			if(health > maxHealth) health = maxHealth;
 			
 			healthMeter.Update(health, maxHealth);
+		}
+		
+		public function Drain(amount:int):void{
+			if(index == 1 && hurtTimer <= 0){
+				hurtTimer = hurtTimerMax;
+				energy -= amount;
+				if(energy < 0) energy = 0;
+				energyMeter.Update(energy, maxEnergy);
+			}
+		}
+		
+		public function Restore(amount:int):void{
+			energy += amount;
+			if(energy > maxEnergy) energy = maxEnergy;
+			
+			healthMeter.Update(energy, maxEnergy);
 		}
 		
 		private function Jump(){
@@ -165,6 +178,7 @@
 			}else if(Keys.Right){
 				scaleX = -1;
 				speedX += a * dt * speedMultiplier;
+				
 			}else{
 				speedX *= .8;
 			}

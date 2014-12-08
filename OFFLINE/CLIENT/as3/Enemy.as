@@ -43,18 +43,6 @@
 			aabb.Update(worldX, worldY);
 		}		
 		
-		this.Hurt = function(amount){
-		if(me.hurtTimer <= 0){
-			me.hurtTimer = me.hurtTimerMax;
-			me.health -= amount;
-			if(me.health < 0) me.health = 0;
-			
-			if(me.health <= 0){
-				// death! woo!
-			}
-		}
-	};
-		
 		public function DropPickups():Array{
 			var pickups:Array = new Array();
 			var numToSpawn:int = Random.Range(1, 5);
