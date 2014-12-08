@@ -8,8 +8,8 @@
 		public var players:Array = new Array(null, null, null, null, null, null, null, null);
 		var nameTexts:Array = new Array();
 		var alerts:Array = new Array();
-		var roomID:uint;
-		var playerID:uint;
+		public var roomID:uint;
+		public var playerID:uint;
 		var hosting:Boolean = false;
 		
 		public function GSLobby(gsm:GameStateManager, roomID:uint, playerID:uint) {
@@ -18,8 +18,9 @@
 			this.roomID = roomID;
 			this.playerID = playerID;
 
-			this.players[playerID] = new Player(1);
+			this.players[playerID] = new Player(Config.StageWidth/2, Config.StageHeight/2, 1);
 			if(playerID == 0) hosting = true;
+			else this.players[0] = new Player(-100, -100, 2);
 			
 			nameTexts.push(name1, name2, name3, name4, name5, name6, name7, name8);
 			lobbyText.text = "Lobby #" + roomID;
@@ -46,8 +47,10 @@
 
 				if(fullSeats & 128 == 128){
 					nameTexts[i].text = "Player " + (i+1);
+					players[i] = new Player(-100, -100, 2);
 				}else{
 					nameTexts[i].text = "empty seat";
+					players[i] = null;
 				}
 				fullSeats >>= 1;
 			}

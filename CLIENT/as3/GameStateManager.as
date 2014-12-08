@@ -108,8 +108,18 @@
 	    }
 
 	    public function SwitchToPlay():void {
+	    	var players:Array;
+	    	var roomID:uint;
+	    	var playerID:uint;
+
+			if(gsCurrent is GSLobby){
+				players = (gsCurrent as GSLobby).players;
+				roomID = (gsCurrent as GSLobby).roomID;
+				playerID = (gsCurrent as GSLobby).playerID;
+			}
+
 			if(gsCurrent != null) removeChild(gsCurrent);
-			gsCurrent = new GSPlay(this);
+			gsCurrent = new GSPlay(this, players, roomID, playerID);
 			addChild(gsCurrent);
 	    }
 

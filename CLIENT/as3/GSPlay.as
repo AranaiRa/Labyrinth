@@ -19,19 +19,19 @@
 		var roundTimer:Number = 30;
 		
 
-		public function GSPlay(gsm:GameStateManager) {
+		public function GSPlay(gsm:GameStateManager, players:Array, roomID:uint, playerID:uint) {
 			super(gsm);
 			
 			cam = new Camera();
-			player = new Player(1);
-			
-			players.push(player);
+			this.players = players;
+			player = this.players[playerID];
 
 			//addChildAt(level, Layer.LEVELBG);
 			addChild(level);
 			
 			for(var i:int = players.length-1; i >= 0; i--){
 				//addChildAt(players[i], Layer.PLAYER);
+				if(players[i] == null) continue;
 				addChild(players[i]);
 			}
 			
@@ -155,6 +155,7 @@
 
 			// update other players
 			for(var i:int = 0; i < players.length; i++){
+				if(players[i] == null) continue;
 				if(players[i].index != 1) players[i].Update(cam);
 			}
 						

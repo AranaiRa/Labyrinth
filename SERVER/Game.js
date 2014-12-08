@@ -179,6 +179,7 @@ exports.Game = function(gameID){
 				if(me.players[j] == null) continue;
 				if(me.pickups[i].canPickup && me.pickups[i].aabb.IsCollidingWith(me.players[j].aabb)){
 					me.GetPickup(j, i);
+					break;
 				}
 			}
 		}

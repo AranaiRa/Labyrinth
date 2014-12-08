@@ -27,12 +27,12 @@
 		var healthMeter:HealthMeter = new HealthMeter();
 		var energyMeter:EnergyMeter = new EnergyMeter();
 		
-		public function Player(index:int) {
+		public function Player(screenX:Number, screenY:Number, index:int) {
 			this.index = index;
 			if(index == 1 && stage) Init();
 			else if(index == 1) addEventListener(Event.ADDED_TO_STAGE, Init);
-			this.x = x;
-			this.y = y;
+			this.x = screenX;
+			this.y = screenY;
 			
 			worldX = x;
 			worldY = y;

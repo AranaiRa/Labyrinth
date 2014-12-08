@@ -11,9 +11,6 @@
 		static var StageLeft:int = 0;
 		static var StageTop:int = 0;
 		static var StageRight:int = 800;
-		static var Ground:int = 550;
-		
-		static var Gravity:Number = 2;
 		
 		static var deltaTime:Number;
 		static var timeElapsed:Number; //how much time has passed in milliseconds

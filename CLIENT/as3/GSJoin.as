@@ -27,7 +27,7 @@
 		public function ReceiveLobbyList(rooms:Array, seats:Array):void{
 			lobbyList.removeAll();
 			for(var i:int = 0; i < rooms.length; i++){
-				lobbyList.addItem( {label:"Lobby #" + rooms[i] + " : " + seats[i] + " seats available",     data:rooms[i]} );
+				lobbyList.addItem( {label:"Lobby #" + rooms[i] + " : " + (8 - seats[i]) + " seats available",     data:rooms[i]} );
 			}
 		}
 		

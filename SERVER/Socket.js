@@ -34,6 +34,7 @@ exports.Socket = function(){
 		switch(type){
 			case Protocol.HOST_LOBBY:
 				if(!player.hosting){
+			console.log("sending host accept");
 					var roomID = ++global.Labyrinth.roomID;
 					console.log("Player " + player.rinfo.address + " created room " + roomID);
 					player.hosting = true;
@@ -45,11 +46,13 @@ exports.Socket = function(){
 					me.SendLobbyState(gameInstance);
 					if(global.Labyrinth.joinableGames == 1) me.Update();
 				}else{
+			console.log("something went wrong");
 					// something went wrong;
 					// server thought this player was hosting already but they sent another host request
 				}
 				break;
 			case Protocol.JOIN_LOBBY:
+			console.log("sending join accept");
 				var roomID = buff.readUInt8(1);
 				var gameInstance = global.Labyrinth.gamelist[roomID];
 				var emptyIndex = -1;
@@ -65,6 +68,7 @@ exports.Socket = function(){
 					gameInstance.AddPlayer(player, emptyIndex);
 
 					console.log("Player " + player.rinfo.address + " wants to join room " + roomID + "in seat " + emptyIndex);
+					player.hosting = false;
 					me.SendJoinAccept(player, roomID, emptyIndex);
 					me.SendLobbyState(gameInstance);
 				}
@@ -73,9 +77,10 @@ exports.Socket = function(){
 				var roomID = buff.readUInt8(1);
 				var gameInstance = global.Labyrinth.gamelist[roomID];
 				if(player.hosting){
+					// send kick to all players in that game.
 					global.Labyrinth.gamelist[roomID] = null;
 					global.Labyrinth.joinableGames--;
-					// send kick to all players in that game.
+					player.hosting = false;
 				}else{
 					gameInstance.RemovePlayer(player);
 					global.Labyrinth.players.RemovePlayer(player);
@@ -83,6 +88,7 @@ exports.Socket = function(){
 				}
 				break;
 			case Protocol.START_GAME:
+				global.Labyrinth.joinableGames--;
 				var roomID = buff.readUInt8(1);
 				me.SendStartAccept(roomID);
 				global.Labyrinth.Play(roomID);
