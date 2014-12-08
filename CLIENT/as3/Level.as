@@ -36,7 +36,7 @@
 					levelString += (", " + grid[j][i]);
 				}
 			}
-			//trace(levelString);
+			trace(levelString);
 		} 
 		
 		public function Update(cam:Camera):void{

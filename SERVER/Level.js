@@ -4,7 +4,7 @@ exports.Level = function(){
 	var me = this;
 	this.size = global.Config.tileSize;
 	this.grid = [
-		[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 		[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 		[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 		[1, 1, 1, 1, 1, 1, 0, 0, 0, 1],
@@ -16,22 +16,62 @@ exports.Level = function(){
 		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 	];
 
+
+	/*[
+		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	];*/
+
+	this.CheckIfOutsideLevel = function(entity){
+		if(entity != null){
+			var entityGridPos = {x:0, y:0};
+			entityGridPos.x = this.WorldToGrid(entity.worldX);
+			entityGridPos.y = this.WorldToGrid(entity.worldY);
+
+			if(entityGridPos.x < 0 ||
+			   entityGridPos.x > this.grid[0].length - 1 ||
+			   entityGridPos.y < 0 ||
+			   entityGridPos.y > this.grid.length - 1){
+				var newPos = this.GetRandomSpawnLocation();
+				entity.worldX = newPos.x;
+				entity.worldY = newPos.y;		
+			}
+		}
+	};
+
 	this.GridToWorld = function(n){
 		return (n * me.size) - (me.size/2);
-	}
+	};
 
 	this.WorldToGrid = function(n){
 		return parseInt((n + me.size/2) / me.size);
-	}
+	};
 	
 	this.CheckCollisionAt = function(px, py) {
 		if (px < 0) return false; // this allows player to move outside grid area
 		if (py < 0) return false;
-		if (px >= me.grid.length) return false;
-		if (py >= me.grid[0].length) return false;
+		if (px >= me.grid[0].length) return false;
+		if (py >= me.grid.length) return false;
 
 		return (me.grid[py][px] > 0);
-	}
+	};
 	
 	this.FixCollisions = function(entity){
 		var collision = false;
@@ -66,14 +106,15 @@ exports.Level = function(){
 			entity.grounded = false;
 		}
 
+		this.CheckIfOutsideLevel(entity);
 		return collision;
-	}
+	};
 	
 	this.GetRandomSpawnLocation = function(){
 		var p = {x:0, y:0};
 		while(true){
-			var gx = global.Random.RangeInt(1, me.grid.length-2);
-			var gy = global.Random.RangeInt(1, me.grid[0].length-2);
+			var gx = global.Random.RangeInt(1, me.grid[0].length-2);
+			var gy = global.Random.RangeInt(1, me.grid.length-2);
 			
 			if(me.grid[gy][gx] > 0)
 				continue;
