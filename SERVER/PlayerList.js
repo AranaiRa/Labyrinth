@@ -16,7 +16,7 @@ exports.PlayerList = function(){
 	this.GetByAddr = function(rinfo){
 		for(var i = 0; i < this.players.length; i++){
 			if(this.players[i] == null){
-				console.log("there is a null player in the array");
+				//console.log("there is a null player in the array");
 				continue;
 			}
 			if(this.players[i].MatchesAddr(rinfo)) return this.players[i];
@@ -31,13 +31,13 @@ exports.PlayerList = function(){
 		var alreadyExists = false;
 		for(var i = 0; i < this.players.length; i++){
 			if(this.players[i] == null){
-				console.log("there is a null player in the array");
+				//console.log("there is a null player in the array");
 				continue;
 			}
 			if(this.players[i].MatchesAddr(rinfo)){
 				alreadyExists = true;
 				player = this.players[i];
-				console.log("player already exists. returning found player");
+				//console.log("player already exists. returning found player");
 			}
 		}
 
@@ -54,7 +54,7 @@ exports.PlayerList = function(){
 		var returnPlayer;
 		for(var i = 0; i < this.players.length; i++){
 			if(this.players[i] == null){
-				console.log("there is a null player in the array");
+				//console.log("there is a null player in the array");
 				continue;
 			}
 			if(this.players[i].MatchesAddr(player.rinfo)){
@@ -62,7 +62,7 @@ exports.PlayerList = function(){
 			}
 		}
 
-		if(returnPlayer == null) console.log("Player does not exist.");
+		if(returnPlayer == null) return; //console.log("Player does not exist.");
 		else return returnPlayer;
 	};
 
@@ -70,6 +70,6 @@ exports.PlayerList = function(){
 		if(index < this.players.length - 1 && this.players[index] != null)
 			return this.players.splice(index, 1)[0];
 		else
-			console.log("Player index does not exist or is null.");
+			//console.log("Player index does not exist or is null.");
 	};
 };

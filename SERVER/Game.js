@@ -23,7 +23,7 @@ exports.Game = function(gameID){
 
 	this.AddPlayer = function(player, index){
 		if(me.players[index] != null){
-			console.log("!!! Attempted to overwrite an existing player. what happened");
+			//console.log("!!! Attempted to overwrite an existing player. what happened");
 		}else{
 			me.players[index] = player;
 			me.fullSeats++;
@@ -40,7 +40,7 @@ exports.Game = function(gameID){
 			}
 		}
 		
-		console.log("!!! No player with that IP exists in this game");
+		//console.log("!!! No player with that IP exists in this game");
 	};
 
 	this.DisconnectPlayer = function(playerID){
@@ -48,9 +48,9 @@ exports.Game = function(gameID){
 			global.Labyrinth.players.RemovePlayer(me.players[playerID]);
 			me.RemovePlayer(me.players[playerID]);
 			// TODO: broadcast disconnect to all other players - as a death?
-			console.log("disconnect player (timeout)")
+			//console.log("disconnect player (timeout)")
 		}else{
-			console.log("!!! Failed to disconnect player: player doesn't exist");
+			//console.log("!!! Failed to disconnect player: player doesn't exist");
 		}
 	};
 
@@ -100,11 +100,11 @@ exports.Game = function(gameID){
 				}
 				global.Labyrinth.players.RemovePlayer(me.players[j]);
 			}
-			console.log("GAME OVER! Player " + winner + " wins!");
+			//console.log("GAME OVER! Player " + winner + " wins!");
 			global.Labyrinth.socket.SendKillPlayer(me, killedPlayerIndex, winner);
 
 		}else if(me.playersLeft < 1){
-			console.log("Two players died at the same time and there was a tie...");
+			//console.log("Two players died at the same time and there was a tie...");
 			global.Labyrinth.socket.SendKillPlayer(me, killedPlayerIndex, 20);
 		}
 
@@ -215,7 +215,6 @@ exports.Game = function(gameID){
 		global.Labyrinth.socket.SendWorldstateEnemies(me);
 
 		if(me.playersLeft <= 1){
-			console.log("I should be killing the game just once.");
 			global.Labyrinth.gamelist[me.id] = null;			
 		}else{
 			setTimeout(me.GameLoop, global.Config.tick);

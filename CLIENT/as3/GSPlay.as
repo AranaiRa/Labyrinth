@@ -71,9 +71,13 @@
 		
 		// Deals with incoming player information packets.
 		public function ReceiveWorldstatePlayer(pID:uint, px:Number, py:Number):void{
-			if(players.length > 0 && players[pID] != null){
-				players[pID].worldX = px;
-				players[pID].worldY = py;
+			try{
+				if(players.length > 0 && players[pID] != null){
+					players[pID].worldX = px;
+					players[pID].worldY = py;
+				}
+			}catch(err:Error){
+				Main.gsm.SwitchToTitle();
 			}
 		}
 		
@@ -129,7 +133,7 @@
 		public function RemoveEnemy(eID:uint):void{
 			var e:Enemy = enemies[eID];
 			if(e == null){
-				trace("Attempted to remove an enemy that doesn't exist...");
+				//trace("Attempted to remove an enemy that doesn't exist...");
 				return;
 			}
 			removeChild(e);
@@ -139,7 +143,7 @@
 		// Deals with incoming enemy information packets.
 		public function ReceiveWorldstateEnemy(pID:uint, playerID:uint, px:Number, py:Number):void{
 			if(enemies[pID] == null){
-				trace("Attempted to update a null enemy");
+				//trace("Attempted to update a null enemy");
 				return;
 			}
 			enemies[pID].targetPlayer = players[playerID];
@@ -171,7 +175,7 @@
 		public function RemovePickup(pID:uint):void{
 			var p:Pickup = pickups[pID];
 			if(p == null){
-				trace("Attempted to remove a pickup that doesn't exist...");
+				//trace("Attempted to remove a pickup that doesn't exist...");
 				return;
 			}
 			removeChild(p);
@@ -181,7 +185,7 @@
 		// Deal with incoming pickup information packets.
 		public function ReceiveWorldstatePickups(pID:uint, px:Number, py:Number):void{
 			if(pickups[pID] == null){
-				trace("Attempted to update a null pickup");
+				//trace("Attempted to update a null pickup");
 				return;
 			}
 			pickups[pID].worldX = px;

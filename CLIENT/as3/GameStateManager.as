@@ -93,7 +93,10 @@
 		}
 
 	    public function SwitchToTitle():void {
-			if(gsCurrent != null) removeChild(gsCurrent);
+	    	
+			if(gsCurrent != null && contains(gsCurrent)) {
+        		removeChild(gsCurrent);
+			}
 			gsCurrent = new GSTitle(this);
 			addChild(gsCurrent);
 	    }

@@ -34,10 +34,10 @@ exports.Socket = function(){
 		switch(type){
 			case Protocol.HOST_LOBBY:
 				if(!player.hosting){
-					console.log("sending host accept");
+					//console.log("sending host accept");
 					var roomID = ++global.Labyrinth.roomID;
 					player.roomID = roomID;
-					console.log("Player " + player.rinfo.address + " created room " + roomID);
+					//console.log("Player " + player.rinfo.address + " created room " + roomID);
 					player.hosting = true;
 					global.Labyrinth.gamelist.push(new Game(roomID));
 					global.Labyrinth.joinableGames++;
@@ -47,8 +47,6 @@ exports.Socket = function(){
 					me.SendLobbyState(gameInstance);
 					if(global.Labyrinth.joinableGames == 1) me.Update();
 				}else{
-			console.log("something went wrong");
-					// something went wrong;
 					// server thought this player was hosting already but they sent another host request
 					global.Labyrinth.gamelist[player.roomID] = null;
 					global.Labyrinth.joinableGames--;
@@ -57,24 +55,23 @@ exports.Socket = function(){
 				}
 				break;
 			case Protocol.JOIN_LOBBY:
-			console.log("sending join accept");
+			//console.log("sending join accept");
 				var roomID = buff.readUInt8(1);
 				var gameInstance = global.Labyrinth.gamelist[roomID];
 				var emptyIndex = -1;
 				for(var i = 0; i < gameInstance.players.length; i++){
 					if(gameInstance.players[i] == null){
 						emptyIndex = i;
-						console.log("does this run when i can't join?")
 						break;
 					}
 				}
-				if(emptyIndex == -1){
-						console.log("maybe this is the problem?")
+				// game is full
+				if(emptyIndex == -1){ 
 					me.SendDeny(player);
 				}else{
 					gameInstance.AddPlayer(player, emptyIndex);
 
-					console.log("Player " + player.rinfo.address + " wants to join room " + roomID + "in seat " + emptyIndex);
+					//console.log("Player " + player.rinfo.address + " wants to join room " + roomID + "in seat " + emptyIndex);
 					player.hosting = false;
 					me.SendJoinAccept(player, roomID, emptyIndex);
 					me.SendLobbyState(gameInstance);
@@ -120,7 +117,7 @@ exports.Socket = function(){
 				player.Keys.Update(Q, W, E, P, J, L, R);
 				break;
 			case Protocol.BROADCAST_LOBBY_LIST:
-				console.log("because it gets broadcasted so yknow.");
+				//console.log("because it gets broadcasted so yknow.");
 				break;
 			default:
 				console.log("received an unkown packet type: "+type);
@@ -193,7 +190,7 @@ exports.Socket = function(){
 			if(gameInstance != null && gameInstance.fullSeats < 8 && !gameInstance.started){
 				buff.writeUInt8(gameInstance.id, 2 + i2*vb);
 				buff.writeUInt8(gameInstance.fullSeats, 3 + i2*vb);
-				console.log("Valid game found: " + gameInstance.id + ", full seats: " + gameInstance.fullSeats);
+				console.log("Broadcasting game: " + gameInstance.id + ", full seats: " + gameInstance.fullSeats);
 				i2++;
 			}
 		}

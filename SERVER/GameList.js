@@ -36,7 +36,7 @@ exports.GameList = function(){
 			this.games[index] = null;
 			this.length--;
 		}
-		console.log("Game was not in gamelist");
+		//console.log("Game was not in gamelist");
 		return false;
 	};
 
