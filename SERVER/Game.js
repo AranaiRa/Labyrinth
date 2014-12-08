@@ -29,17 +29,21 @@ exports.Game = function(gameID){
 		}
 	};
 
-	this.RemovePlayer = function(player, index){
-		if(me.players[index].MatchesAddr(player)){
-			me.players[index] = null;
-			me.fullSeats--;
-		}else{
-			console.log("!!! Attempted to remove the wrong player. what happened");
+	this.RemovePlayer = function(player){
+		for(var i = 0; i < me.players.length; i++){
+			if(me.players[i].MatchesAddr(player.rinfo)){
+				me.players[i] = null;
+				me.fullSeats--;
+				return;
+			}
 		}
+		
+		console.log("!!! No player with that IP exists in this game");
 	};
 
 	this.DisconnectPlayer = function(playerID){
 		if(me.players[playerID] != null){
+			global.Labyrinth.players.Remove(me.players[playerID]);
 			me.players.splice(playerID, 1);
 			// TODO: broadcast disconnect to all other players
 			console.log("disconnect player (timeout)")
@@ -64,8 +68,10 @@ exports.Game = function(gameID){
 		// set up players
 		for(var i = 0; i < me.players.length; i++){
 			// spawning info, etc;
-			var spawnPos = me.level.GetRandomSpawnLocation();
-			me.players[i].SetUp(spawnPos.x, spawnPos.y);
+			if(me.players[i] != null){
+				var spawnPos = me.level.GetRandomSpawnLocation();
+				me.players[i].SetUp(spawnPos.x, spawnPos.y);
+			}
 		}
 
 		// set up spawns
@@ -85,6 +91,7 @@ exports.Game = function(gameID){
 		// This loop updates players, checks for timeout, respawns if health is below 0,
 		// retrieves the player's attacks if there are any, and checks for collision with spawners
 		for(var i = 0; i < me.players.length; i++){
+			if(me.players[i] == null) continue;
 			// check to disconnect players
 			if(me.players[i].CheckForTimeout(dt)) {
 				me.DisconnectPlayer(i);
@@ -123,6 +130,7 @@ exports.Game = function(gameID){
 			me.level.FixCollisions(me.enemies[i]);
 
 			for(var j = 0; j < me.players.length; j++){
+				if(me.players[j] == null) continue;
 				if(me.enemies[i].hurtOnContact && me.enemies[i].aabb.IsCollidingWith(me.players[j].aabb)){
 					me.players[j].Hurt(me.enemies[i].damage);
 					if(me.players[j].health <= 0){
@@ -135,6 +143,7 @@ exports.Game = function(gameID){
 		// this loop checks for player attacks hitting other players and enemies
 		for(var i = 0; i < me.attacks.length; i++){
 			for(var j = 0; j < me.players.length; j++){
+				if(me.players[j] == null) continue;
 				var pID = me.attacks[i].playerID;
 				if(pID == j) continue; // so players can't hurt themselves
 				if(me.attacks[i].aabb.IsCollidingWith(me.players[j].aabb)){
@@ -167,6 +176,7 @@ exports.Game = function(gameID){
 			global.Labyrinth.socket.SendWorldstatePickups(me);
 
 			for(var j = 0; j < me.players.length; j++){
+				if(me.players[j] == null) continue;
 				if(me.pickups[i].canPickup && me.pickups[i].aabb.IsCollidingWith(me.players[j].aabb)){
 					me.GetPickup(j, i);
 				}

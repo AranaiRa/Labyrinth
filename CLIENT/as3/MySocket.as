@@ -151,6 +151,14 @@
 			SendPacket(data);
 		}
 		
+		// creates and sends a LEAVE packet
+		function SendPacketLeaveLobby(roomID:int):void {
+			var data:ByteArray = new ByteArray();
+			data.writeByte(Protocol.LEAVE_LOBBY);
+			data.writeByte(roomID);
+			SendPacket(data);
+		}
+		
 		// creates and sends a START packet
 		function SendPacketStartGame(roomID:int):void {
 			var data:ByteArray = new ByteArray();

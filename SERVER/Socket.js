@@ -38,11 +38,12 @@ exports.Socket = function(){
 					console.log("Player " + player.rinfo.address + " created room " + roomID);
 					player.hosting = true;
 					global.Labyrinth.gamelist.push(new Game(roomID));
+					global.Labyrinth.joinableGames++;
 					var gameInstance = global.Labyrinth.gamelist[roomID];
 					gameInstance.AddPlayer(player, 0);
 					me.SendJoinAccept(player, roomID, 0);
 					me.SendLobbyState(gameInstance);
-					if(roomID == 1) me.Update();
+					if(global.Labyrinth.joinableGames == 1) me.Update();
 				}else{
 					// something went wrong;
 					// server thought this player was hosting already but they sent another host request
@@ -69,9 +70,17 @@ exports.Socket = function(){
 				}
 				break;
 			case Protocol.LEAVE_LOBBY:
-				// TODO:
-				// check if the player that left was a host
-				// send kick to all other players
+				var roomID = buff.readUInt8(1);
+				var gameInstance = global.Labyrinth.gamelist[roomID];
+				if(player.hosting){
+					global.Labyrinth.gamelist[roomID] = null;
+					global.Labyrinth.joinableGames--;
+					// send kick to all players in that game.
+				}else{
+					gameInstance.RemovePlayer(player);
+					global.Labyrinth.players.RemovePlayer(player);
+					me.SendLobbyState(gameInstance);
+				}
 				break;
 			case Protocol.START_GAME:
 				var roomID = buff.readUInt8(1);
@@ -109,8 +118,11 @@ exports.Socket = function(){
 	};
 
 	this.Update = function(){
-		me.BroadcastLobbyList();
-		setTimeout(me.Update, 4000);
+		console.log("test" + global.Labyrinth.joinableGames);
+		if(global.Labyrinth.joinableGames > 0){
+			me.BroadcastLobbyList();
+			setTimeout(me.Update, 4000);
+		}
 	}
 
 	this.Send = function(buff, rinfo){
@@ -212,7 +224,7 @@ exports.Socket = function(){
 	**************************************************/
 	this.SendWorldstatePlayers = function(gameInstance){
 
-		var numPlayers = gameInstance.players.length;
+		var numPlayers = gameInstance.fullSeats;
 		var hb = 2; // header bytes; static; same length for every packet
 		var vb = 9; // variable bytes; nonstatic; bytes per object in loop
 
@@ -225,6 +237,7 @@ exports.Socket = function(){
 
 		// variable bytes
 		for(var i = 0; i < numPlayers; i++){
+			if(gameInstance.players[i] == null) continue;
 			buff.writeUInt8(i, 2 + i*vb);
 			buff.writeFloatBE(gameInstance.players[i].worldX, 3 + i*vb);
 			buff.writeFloatBE(gameInstance.players[i].worldY, 7 + i*vb);

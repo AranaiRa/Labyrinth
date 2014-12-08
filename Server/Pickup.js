@@ -12,9 +12,7 @@ exports.Pickup = function(x, y){
 	this.a = 1500;
 
 	this.amount = global.Random.ChooseOne([1, 3, 5]);
-	console.log("Pickup amount: " + this.amount);
 	this.type = global.Random.ChooseOne([PickupType.HPUP, PickupType.ATKUP, PickupType.SPDUP, PickupType.ENERGYUP]);
-	console.log("Pickup type: " + this.type);
 
 	this.width = 32 * (this.amount/2);
 	this.height = 32 * (this.amount/2);

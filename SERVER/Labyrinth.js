@@ -34,12 +34,13 @@ global.Labyrinth = {
 	roomID:0,
 	players:new PlayerList(),
 	gamelist:[null],
+	joinableGames:0,
 	socket:new Socket(),
 	Start:function(){
 		this.socket.Listen();
 	},
 	Play:function(id){ // call this to start the gameloop
-		this.gamelist.Get(id).SetUp();
+		this.gamelist[id].SetUp();
 	},
 };
 

@@ -2,9 +2,8 @@ var AABB = require("./AABB.js").AABB;
 var PlayerAttack = require("./PlayerAttack.js").PlayerAttack;
 var AttackGenerator = require("./AttackGenerator.js");
 
-exports.Player = function(playerID, rinfo){
+exports.Player = function(rinfo){
 	var me = this;
-	this.id = playerID;
 	this.hosting = false;
 	this.rinfo = rinfo;
 	this.timeSinceLastPacket = 0;
@@ -118,7 +117,6 @@ exports.Player = function(playerID, rinfo){
 	};
 
 	this.AddHealth = function(amount){
-		console.log("Health is currently: " + me.health + ", adding: " + amount);
 		var percentage = me.health/me.maxHealth;
 		me.maxHealth += amount;
 		me.health = Math.ceil(me.maxHealth * percentage);

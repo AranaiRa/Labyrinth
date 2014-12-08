@@ -59,7 +59,7 @@
 		
 		public function HandleBack(e:MouseEvent):void{
 			gsm.SwitchToTitle();
-			// send leave packet
+			Main.socket.SendPacketLeaveLobby(roomID);
 		}		
 	}
 }
