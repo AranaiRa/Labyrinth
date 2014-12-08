@@ -1,5 +1,6 @@
 ﻿package as3 {
 	
+	// This class follows a specific target to keep it in the center of the screen.
 	public class Camera {
 
 		var x:Number, y:Number;

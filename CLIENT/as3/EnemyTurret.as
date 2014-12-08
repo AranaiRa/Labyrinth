@@ -2,7 +2,7 @@
 	
 	import flash.display.MovieClip;
 	
-	
+	//Controls turret-type enemies.
 	public class EnemyTurret extends Enemy {
 						
 		public function EnemyTurret() {

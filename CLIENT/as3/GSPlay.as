@@ -3,6 +3,7 @@
 	import flash.geom.Point;
 	import flash.events.*;	
 	
+	// This class controls the play state.
 	public class GSPlay extends GameState {
 
 		var playerID:uint;
@@ -63,13 +64,15 @@
 			stage.focus = this;
 		}
 		
+		// Deals with incoming player information packets.
 		public function ReceiveWorldstatePlayer(pID:uint, px:Number, py:Number):void{
 			if(players.length > 0 && players[pID] != null){
 				players[pID].worldX = px;
 				players[pID].worldY = py;
 			}
 		}
-
+		
+		
 		public function KillPlayer(playerToKill:uint, winner:uint):void{
 			if(winner > 0){
 				Main.gsm.SwitchToEnd(winner, playerID);
@@ -82,11 +85,13 @@
 			}
 			players[playerToKill].gotoAndStop(Player.DEADFRAME);
 		}
-
+		
+		// Updates the player's stats to the given values.
 		public function UpdateStats(hp:uint, maxhp:uint, energy:uint, maxenergy:uint):void{
 			player.UpdateStats(hp, maxhp, energy, maxenergy);		
 		}
-
+		
+		// Spawns an enemy into the world. Currently only accepts hoppers.
 		public function AddEnemy(eType:uint):void{ // tell it what index to be at??
 			var e:Enemy;
 			switch(eType){
@@ -114,7 +119,8 @@
 			addChild(e);
 			enemies.push(e);
 		}
-
+		
+		// Removes an enemy instance from the play state.
 		public function RemoveEnemy(eID:uint):void{
 			var e:Enemy = enemies[eID];
 			if(e == null){
@@ -124,7 +130,8 @@
 			removeChild(e);
 			enemies.splice(eID, 1);
 		}
-
+		
+		// Deals with incoming enemy information packets.
 		public function ReceiveWorldstateEnemy(pID:uint, playerID:uint, px:Number, py:Number):void{
 			if(enemies[pID] == null){
 				trace("Attempted to update a null enemy");
@@ -134,7 +141,8 @@
 			enemies[pID].worldX = px;
 			enemies[pID].worldY = py;
 		}
-
+		
+		// Deals with incoming spawner information packets.
 		public function ReceiveWorldstateSpawner(pID:uint, px:Number, py:Number):void{
 			if(spawners[pID] == null){
 				spawners.push(new EnemySpawner(px, py));
@@ -146,13 +154,15 @@
 			}
 		}
 
+		// Adds a pickup instance to the world.
 		public function AddPickup(pType:uint, pAmount:uint):void{
 			var p:Pickup = new Pickup(pType, pAmount);
 			//addChildAt(p, Layer.PICKUP);
 			addChild(p);
 			pickups.push(p);
 		}
-
+		
+		// Remove a pickup instance from the world.
 		public function RemovePickup(pID:uint):void{
 			var p:Pickup = pickups[pID];
 			if(p == null){
@@ -163,6 +173,7 @@
 			pickups.splice(pID, 1);
 		}
 
+		// Deal with incoming pickup information packets.
 		public function ReceiveWorldstatePickups(pID:uint, px:Number, py:Number):void{
 			if(pickups[pID] == null){
 				trace("Attempted to update a null pickup");

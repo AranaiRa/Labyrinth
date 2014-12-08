@@ -2,7 +2,7 @@
 	
 	import flash.display.MovieClip;
 	
-	
+	// This class controls hopper-type enemies.
 	public class EnemyHopper extends Enemy {
 				
 		public function EnemyHopper() {

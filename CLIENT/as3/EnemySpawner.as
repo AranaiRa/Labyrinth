@@ -2,6 +2,7 @@
 	
 	import flash.display.MovieClip;
 	
+	// Controls spaces in the world that create enemies when touched.
 	public class EnemySpawner extends MovieClip {
 		
 		var worldX:Number, worldY:Number;

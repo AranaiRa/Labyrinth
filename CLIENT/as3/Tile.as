@@ -2,7 +2,7 @@
 	
 	import flash.display.MovieClip;
 	
-	
+	// This class controls the tiles that make up the level.
 	public class Tile extends MovieClip {
 		
 		var worldX:Number;

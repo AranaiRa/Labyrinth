@@ -4,6 +4,7 @@
 	import flash.events.*;	
 	import flash.system.Security;
 	
+	// This class controls the game state in which players join a lobby.
 	public class GSJoin extends GameState {
 		
 		var roomID:int;
@@ -24,6 +25,7 @@
 			lobbyList.addEventListener(Event.CHANGE, UpdateSelection);
 		}
 		
+		// Deal with incoming lobby information.
 		public function ReceiveLobbyList(rooms:Array, seats:Array):void{
 			lobbyList.removeAll();
 			for(var i:int = 0; i < rooms.length; i++){
@@ -37,10 +39,12 @@
 			if(!bttnJoin.visible) bttnJoin.visible = true;
 		}
 
+		// Sends joining packet to the server.
 		public function HandleJoin(e:MouseEvent):void{
 			Main.socket.SendPacketJoinLobby(roomID);
 		}
 		
+		// Returns to the main title screen.
 		public function HandleBack(e:MouseEvent):void{
 			gsm.SwitchToTitle();
 		}

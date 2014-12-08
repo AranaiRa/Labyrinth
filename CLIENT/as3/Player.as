@@ -4,8 +4,8 @@
 	import flash.events.*;
 	import flash.geom.Point;
 	
+	// This class controls the player.
 	public class Player extends MovieClip {
-		// true when jump_intro is playing; false to indicate that jump_up should play
 		
 		public static var DEADFRAME:int = 2;
 
@@ -67,7 +67,8 @@
 				Keys.KeyPressed(e, false);
 			}
 		}
-
+		
+		// Adjusts stat values and informs the HUD bars of changes.
 		public function UpdateStats(hp:uint, maxhp:uint, energy:uint, maxenergy:uint):void{
 			this.health = hp;
 			this.maxHealth = maxhp;
@@ -83,12 +84,14 @@
 			if(index == 2) Update2(cam);
 		}
 		
+		// Update function if the player matches the client ID.
 		public function Update1():void{			
 			Keys.Update();
 			if(Keys.Left) scaleX = 1;
 			if(Keys.Right) scaleX = -1;
 		}
 		
+		// Update function if the player does not match the client ID.
 		public function Update2(cam:Camera):void{	
 			if(worldX > lastX) scaleX = -1;
 			if(worldX < lastX) scaleX = 1;

@@ -2,6 +2,7 @@
 	
 	import flash.display.MovieClip;
 	
+	// This class controls the player's energy bar GUI.
 	public class EnergyMeter extends MovieClip {
 		
 		var bar:MovieClip;
