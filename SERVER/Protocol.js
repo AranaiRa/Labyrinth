@@ -25,5 +25,6 @@ exports.Protocol = {
 	REMOVE_PICKUP:22,
 	STAT_UPDATE:23,
 
-	LOBBY_STATE:24 // server, move up later
+	LOBBY_STATE:24, // server, move up later
+	KILL_PLAYER:25
 };

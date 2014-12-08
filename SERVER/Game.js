@@ -19,6 +19,7 @@ exports.Game = function(gameID){
 	this.time = 0; // game time
 	this.level = new Level();
 	this.fullSeats = 0;
+	this.playersLeft;
 
 	this.AddPlayer = function(player, index){
 		if(me.players[index] != null){
@@ -34,6 +35,7 @@ exports.Game = function(gameID){
 			if(me.players[i].MatchesAddr(player.rinfo)){
 				me.players[i] = null;
 				me.fullSeats--;
+				me.playersLeft--;
 				return;
 			}
 		}
@@ -43,9 +45,9 @@ exports.Game = function(gameID){
 
 	this.DisconnectPlayer = function(playerID){
 		if(me.players[playerID] != null){
-			global.Labyrinth.players.Remove(me.players[playerID]);
-			me.players.splice(playerID, 1);
-			// TODO: broadcast disconnect to all other players
+			global.Labyrinth.players.RemoveIndex(playerID);
+			me.RemovePlayer(me.players[playerID]);
+			// TODO: broadcast disconnect to all other players - as a death?
 			console.log("disconnect player (timeout)")
 		}else{
 			console.log("!!! Failed to disconnect player: player doesn't exist");
@@ -73,6 +75,7 @@ exports.Game = function(gameID){
 				me.players[i].SetUp(spawnPos.x, spawnPos.y);
 			}
 		}
+		me.playersLeft = me.fullSeats;
 
 		// set up spawns
 		for(var i = 0; i < global.Config.numSpawners; i++){
@@ -84,6 +87,28 @@ exports.Game = function(gameID){
 
 		me.GameLoop();
 	};
+
+	// this gets called when a player is disconnected or killed and has 0 lives left
+	this.CheckForGameOver = function(killedPlayerIndex){
+		var winner = 0;
+
+		if(me.playersLeft == 1){ // all players are dead except 1, game is over
+			for(var j = 0; j < me.players.length; j++){ // find winner
+				if(me.players[j].lives > 0){
+					winner = j+1;
+					break;
+				}
+			}
+			console.log("GAME OVER! Player " + winner + " wins!");
+			global.Labyrinth.socket.SendKillPlayer(me, killedPlayerIndex, winner);
+
+		}else if(me.playersLeft < 1){
+			console.log("Two players died at the same time and there was a tie...");
+			global.Labyrinth.socket.SendKillPlayer(me, killedPlayerIndex, 20);
+		}
+
+		// otherwise there are 2 or more players left and game isn't over.
+	};
 	
 	this.GameLoop = function(){ // in this function, use `me` instead of `this`
 		var dt = me.GetDeltaTime();
@@ -92,17 +117,24 @@ exports.Game = function(gameID){
 		// retrieves the player's attacks if there are any, and checks for collision with spawners
 		for(var i = 0; i < me.players.length; i++){
 			if(me.players[i] == null) continue;
-			// check to disconnect players
-			if(me.players[i].CheckForTimeout(dt)) {
+			// check to disconnect players if they're still alive
+			if(me.players[i].lives > 0 && me.players[i].CheckForTimeout(dt)) {
 				me.DisconnectPlayer(i);
+				me.CheckForGameOver(i);
 				continue;
 			}
 
 			me.players[i].Update(dt);
 			me.level.FixCollisions(me.players[i]);
 
-			if(me.players[i].health <= 0){ // TODO: add some type of death delay?
+			// if player health dropped below 0, kill them and respawn them if they have lives left
+			if(me.players[i].health <= 0 && me.players[i].lives > 0){ 
 				me.players[i].Respawn(me.level.GetRandomSpawnLocation());
+
+				if(me.players[i].lives <= 0){ // check if player is permadead
+					me.playersLeft--;
+					me.CheckForGameOver(i);
+				}
 			}
 
 			// get player attacks
@@ -130,12 +162,9 @@ exports.Game = function(gameID){
 			me.level.FixCollisions(me.enemies[i]);
 
 			for(var j = 0; j < me.players.length; j++){
-				if(me.players[j] == null) continue;
+				if(me.players[j] == null/* || me.players[j].lives <= 0*/) continue;
 				if(me.enemies[i].hurtOnContact && me.enemies[i].aabb.IsCollidingWith(me.players[j].aabb)){
 					me.players[j].Hurt(me.enemies[i].damage);
-					if(me.players[j].health <= 0){
-						me.players[j].Respawn(me.level.GetRandomSpawnLocation());
-					}
 				}
 			}
 		}
@@ -143,22 +172,19 @@ exports.Game = function(gameID){
 		// this loop checks for player attacks hitting other players and enemies
 		for(var i = 0; i < me.attacks.length; i++){
 			for(var j = 0; j < me.players.length; j++){
-				if(me.players[j] == null) continue;
+				if(me.players[j] == null/* || me.players[j].lives <= 0*/) continue;
 				var pID = me.attacks[i].playerID;
 				if(pID == j) continue; // so players can't hurt themselves
 				if(me.attacks[i].aabb.IsCollidingWith(me.players[j].aabb)){
-					var damage = me.attacks[i].dmg * me.players[pID].damageMultiplier;
+					var damage = Math.floor(me.attacks[i].dmg * me.players[pID].damageMultiplier);
 					me.players[j].Hurt(damage);
-					if(me.players[j].health <= 0){
-						me.players[j].Respawn(me.level.GetRandomSpawnLocation());
-					}
 				}
 			}
 
 			for(var j = me.enemies.length - 1; j >= 0; j--){
 				if(me.attacks[i].aabb.IsCollidingWith(me.enemies[j].aabb)){
 					var pID = me.attacks[i].playerID;
-					var damage = me.attacks[i].dmg * me.players[pID].damageMultiplier;
+					var damage = Math.floor(me.attacks[i].dmg * me.players[pID].damageMultiplier);
 					me.enemies[j].Hurt(damage);
 					if(me.enemies[j].health <= 0){
 						me.KillEnemy(j);

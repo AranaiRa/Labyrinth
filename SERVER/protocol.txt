@@ -94,15 +94,6 @@ Server -> Client
 	0	1	uint8 	Packet Type
 	1	2	uint16	Seconds Left
 
-	STAT_UPDATE
-	O 	L 	Type 	Description
-	============================
-	0	1	uint8 	Packet Type
-	1	2	uint16	Current HP
-	3	2	uint16	Max HP
-	5	2	uint16	Current Energy
-	7	2	uint16	Max Energy
-
 	WORLDSTATE_PLAYERINFO
 	O 			L 	Type 	Description
 	============================
@@ -112,6 +103,22 @@ Server -> Client
 	(2 + n) 	1 	uint8 	Object Index
 	(3 + n)		4	float	X Pos
 	(7 + n)		4	float	Y Pos
+
+	KILL_PLAYER
+	O 	L 	Type 	Description
+	============================
+	0	1	uint8 	Packet Type
+	2	1	uint8 	ID of player to kill
+	3	1	uint8 	ID of player who won ( > 0 if game over, 20 if tie?)
+
+	STAT_UPDATE
+	O 	L 	Type 	Description
+	============================
+	0	1	uint8 	Packet Type
+	1	2	uint16	Current HP
+	3	2	uint16	Max HP
+	5	2	uint16	Current Energy
+	7	2	uint16	Max Energy
 
 	ADD_ENEMY
 	O 			L 	Type 	Description

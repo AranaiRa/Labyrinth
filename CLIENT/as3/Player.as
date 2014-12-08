@@ -7,6 +7,8 @@
 	public class Player extends MovieClip {
 		// true when jump_intro is playing; false to indicate that jump_up should play
 		
+		public static var DEADFRAME:int = 2;
+
 		var index:int;
 		//**************
 		var worldX:Number, worldY:Number;
@@ -36,6 +38,7 @@
 			
 			worldX = x;
 			worldY = y;
+			stop();
 		}
 		
 		public function Init(e:Event = null):void{

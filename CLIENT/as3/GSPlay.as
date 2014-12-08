@@ -1,8 +1,11 @@
 ﻿package as3 {
 
 	import flash.geom.Point;
+	import flash.events.*;	
 	
 	public class GSPlay extends GameState {
+
+		var playerID:uint;
 		
 		var level:Level = new Level();
 		
@@ -21,10 +24,15 @@
 
 		public function GSPlay(gsm:GameStateManager, players:Array, roomID:uint, playerID:uint) {
 			super(gsm);
+
+			this.playerID = playerID;
 			
 			cam = new Camera();
 			this.players = players;
 			player = this.players[playerID];
+
+			if(stage) Init();
+			else addEventListener(Event.ADDED_TO_STAGE, Init);
 
 			//addChildAt(level, Layer.LEVELBG);
 			addChild(level);
@@ -48,11 +56,31 @@
 			Config.timer.start();
 		}
 		
+		public function Init(e:Event = null):void{
+			removeEventListener(Event.ADDED_TO_STAGE, Init);
+			
+			stage.stageFocusRect = false;
+			stage.focus = this;
+		}
+		
 		public function ReceiveWorldstatePlayer(pID:uint, px:Number, py:Number):void{
 			if(players.length > 0 && players[pID] != null){
 				players[pID].worldX = px;
 				players[pID].worldY = py;
 			}
+		}
+
+		public function KillPlayer(playerToKill:uint, winner:uint):void{
+			if(winner > 0){
+				// switch to end of game
+			}
+
+			if(playerToKill == playerID){
+				// you died
+				// stop listening to input so you don't wiggle around while you're dead
+				// switch camera to a different player??
+			}
+			players[playerToKill].gotoAndStop(Player.DEADFRAME);
 		}
 
 		public function UpdateStats(hp:uint, maxhp:uint, energy:uint, maxenergy:uint):void{

@@ -4,7 +4,6 @@
 	public class GameStateManager extends MovieClip{
 		
 		var gsCurrent:GameState;
-		public var hosting:Boolean;
 
 		public function GameStateManager() {
 			SwitchToTitle();
@@ -32,6 +31,13 @@
 		public function ReceiveWorldstatePlayer(pID:uint, px:Number, py:Number):void{
 			if(gsCurrent is GSPlay){
 				(gsCurrent as GSPlay).ReceiveWorldstatePlayer(pID, px, py);
+			}
+		}
+
+		// winner will be > 0 if game is over
+		public function KillPlayer(playerToKill:uint, winner:uint):void{
+			if(gsCurrent is GSPlay){
+				(gsCurrent as GSPlay).KillPlayer(playerToKill, winner);
 			}
 		}
 

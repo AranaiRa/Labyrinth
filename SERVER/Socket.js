@@ -90,6 +90,8 @@ exports.Socket = function(){
 			case Protocol.START_GAME:
 				global.Labyrinth.joinableGames--;
 				var roomID = buff.readUInt8(1);
+				var gameInstance = global.Labyrinth.gamelist[roomID];
+				me.SendLobbyState(gameInstance);
 				me.SendStartAccept(roomID);
 				global.Labyrinth.Play(roomID);
 				break;
@@ -124,7 +126,6 @@ exports.Socket = function(){
 	};
 
 	this.Update = function(){
-		console.log("test" + global.Labyrinth.joinableGames);
 		if(global.Labyrinth.joinableGames > 0){
 			me.BroadcastLobbyList();
 			setTimeout(me.Update, 4000);
@@ -132,7 +133,6 @@ exports.Socket = function(){
 	}
 
 	this.Send = function(buff, rinfo){
-		//console.log("Attempting to send data to " + rinfo.address + ":" + rinfo.port);
 		me.socket.send(buff, 0, buff.length, rinfo.port, rinfo.address, function(err, bytes){
 
 		});
@@ -222,7 +222,26 @@ exports.Socket = function(){
 	};
 
 	/**************************************************
-	* Packet Type
+	* Packet Type: KILL_PLAYER
+	* 1 for end game, 0 for keep playing
+	* ID of player to kill (0-7)
+	* ID of winning player (1-8)
+	**************************************************/
+	this.SendKillPlayer = function(gameInstance, playerID, winner){
+
+		var len = 3;
+		var buff = new Buffer(len);
+
+		// header bytes
+		buff.writeUInt8(Protocol.KILL_PLAYER, 0);
+		buff.writeUInt8(playerID, 1);
+		buff.writeUInt8(winner, 2);
+
+		this.SendToPlayers(buff, gameInstance.players);
+	};
+
+	/**************************************************
+	* Packet Type: WORLDSTATE_PLAYERINFO
 	* Number of Players
 	*   Player index
 	*   worldX

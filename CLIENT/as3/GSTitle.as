@@ -16,12 +16,10 @@
 		}
 		
 		public function HandleHost(e:MouseEvent):void{
-			gsm.hosting = true; // should always work
 			Main.socket.SendPacketHostLobby();
 		}
 		
 		public function HandleJoin(e:MouseEvent):void{
-			gsm.hosting = false;
 			gsm.SwitchToJoin();
 		}
 		

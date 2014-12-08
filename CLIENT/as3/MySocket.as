@@ -9,7 +9,7 @@
 	public class MySocket extends DatagramSocket {
 
 		// server/client address info
-		var ipClient:String = "10.0.0.10";//"10.252.20.249";//
+		//var ipClient:String = "10.0.0.10";//"10.252.20.249";//
 		var ipServer:String = "10.0.0.10";//
 		var portClient:int = 4326;
 		var portServer:int = 1236;
@@ -22,7 +22,7 @@
 		// sets up the socket to begin sending/receiving packets
 		public function Start():void {
 			addEventListener(DatagramSocketDataEvent.DATA, HandleData);
-			bind(portClient, ipClient);
+			bind(portClient/*, ipClient*/);
 			receive();  
 		}
 		
@@ -72,17 +72,19 @@
 						var pID:uint = e.data.readUnsignedByte();
 						var px:Number = e.data.readFloat();
 						var py:Number = e.data.readFloat();
-						//trace("Player " + pID + " is at position (" + px + ", " + py + ")");
 						Main.gsm.ReceiveWorldstatePlayer(pID, px, py);
 					}
+					break;
+				case Protocol.KILL_PLAYER:
+					var playerToKill:uint = e.data.readUnsignedByte();
+					var winner:uint = e.data.readUnsignedByte();
+					Main.gsm.KillPlayer(playerToKill, winner);
 					break;
 				case Protocol.STAT_UPDATE:
 					var hp:uint = e.data.readUnsignedShort();
 					var maxhp:uint = e.data.readUnsignedShort();
 					var energy:uint = e.data.readUnsignedShort();
 					var maxenergy:uint = e.data.readUnsignedShort();
-					//trace("Receiving health: " + hp + "/" + maxhp);
-					//trace("Receiving energy: " + energy + "/" + maxenergy);
 					Main.gsm.UpdateStats(hp, maxhp, energy, maxenergy);
 					break;
 				case Protocol.ADD_ENEMY:
@@ -100,7 +102,6 @@
 						var playerID:uint = e.data.readUnsignedByte();
 						var px:Number = e.data.readFloat();
 						var py:Number = e.data.readFloat();
-						//trace("Enemy " + pID + " is at position (" + px + ", " + py + ")");
 						Main.gsm.ReceiveWorldstateEnemy(pID, playerID, px, py);
 					}
 					break;

@@ -57,7 +57,7 @@ exports.Player = function(rinfo){
 	this.hasBuzzsaw = true;
 	this.jumpsLeft = 2;
 
-	this.lives = 3;
+	this.lives = 1;//3;
 	this.health = 100;
 	this.maxHealth = 100;
 	this.hurtTimer = 0;
@@ -105,15 +105,15 @@ exports.Player = function(rinfo){
 
 	this.Respawn = function(pos){
 		this.lives--;
-		console.log("lives: "+this.lives);
-		if(this.lives >= 0){
+		if(this.lives > 0){
 			this.health = this.maxHealth;
 			this.worldX = pos.x;
 			this.worldY = pos.y;
 		}
 		else{
-			console.log("Hey, uh, maybe player "+p.index+" should be dead?");
+			//console.log("Hey, uh, maybe player "+rinfo.address+" should be dead?");
 		}
+		global.Labyrinth.socket.SendStats(me);
 	};
 
 	this.AddHealth = function(amount){
@@ -160,6 +160,7 @@ exports.Player = function(rinfo){
 
 	this.Update = function(dt){
 		////////////////////////// GAME UPDATE:
+		if(this.lives <= 0) return;
 		if(this.hurtTimer >= 0) this.hurtTimer -= dt;
 
 		// Energy regeneration
