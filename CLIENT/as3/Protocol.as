@@ -9,7 +9,7 @@
 		public static var INPUT:int = 5;
 		////////////// SERVER:
 		public static var BROADCAST_LOBBY_LIST:int = 6;
-		public static var LOBBY_FULL:int = 7;
+		public static var DENIED:int = 7;
 		public static var JOIN_ACCEPT:int = 8;
 		public static var BROADCAST_LOBBY_STATE:int = 9;
 		public static var START_ACCEPT:int = 10;

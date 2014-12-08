@@ -7,7 +7,7 @@ exports.Protocol = {
 	INPUT:5,
 	////////////// SERVER:
 	BROADCAST_LOBBY_LIST: 6,
-	LOBBY_FULL: 7,
+	DENIED: 7,
 	JOIN_ACCEPT: 8,
 	BROADCAST_LOBBY_STATE: 9,
 	START_ACCEPT: 10,

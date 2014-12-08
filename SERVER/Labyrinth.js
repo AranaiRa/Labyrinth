@@ -36,6 +36,7 @@ global.Labyrinth = {
 	socket:new Socket(),
 	Start:function(){
 		this.socket.Listen();
+		this.socket.BroadcastKickAll();
 	},
 	Play:function(id){ // call this to start the gameloop
 		this.gamelist[id].SetUp();

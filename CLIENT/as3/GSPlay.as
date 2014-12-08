@@ -25,35 +25,40 @@
 		public function GSPlay(gsm:GameStateManager, players:Array, roomID:uint, playerID:uint) {
 			super(gsm);
 
-			this.playerID = playerID;
-			
-			cam = new Camera();
-			this.players = players;
-			player = this.players[playerID];
+			try{
+				this.playerID = playerID;
+				
+				cam = new Camera();
+				this.players = players;
+				player = this.players[playerID];
 
-			if(stage) Init();
-			else addEventListener(Event.ADDED_TO_STAGE, Init);
+				if(stage) Init();
+				else addEventListener(Event.ADDED_TO_STAGE, Init);
 
-			//addChildAt(level, Layer.LEVELBG);
-			addChild(level);
-			
-			for(var i:int = players.length-1; i >= 0; i--){
-				//addChildAt(players[i], Layer.PLAYER);
-				if(players[i] == null) continue;
-				addChild(players[i]);
+				//addChildAt(level, Layer.LEVELBG);
+				addChild(level);
+				
+				for(var i:int = players.length-1; i >= 0; i--){
+					//addChildAt(players[i], Layer.PLAYER);
+					if(players[i] == null) continue;
+					addChild(players[i]);
+				}
+				
+				for(var i:int = spawners.length-1; i >= 0; i--){
+					//addChildAt(spawners[i], Layer.SPAWNER);
+					addChild(spawners[i]);
+				}
+				
+				for(var i:int = enemies.length-1; i >= 0; i--){
+					//addChildAt(enemies[i], Layer.ENEMY);
+					addChild(enemies[i]);
+				}
+				
+				Config.timer.start();
+			}catch(err:Error){
+				// ha ha, no run time errors for you.
+				Main.gsm.SwitchToTitle();
 			}
-			
-			for(var i:int = spawners.length-1; i >= 0; i--){
-				//addChildAt(spawners[i], Layer.SPAWNER);
-				addChild(spawners[i]);
-			}
-			
-			for(var i:int = enemies.length-1; i >= 0; i--){
-				//addChildAt(enemies[i], Layer.ENEMY);
-				addChild(enemies[i]);
-			}
-			
-			Config.timer.start();
 		}
 		
 		public function Init(e:Event = null):void{

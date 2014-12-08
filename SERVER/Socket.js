@@ -34,8 +34,9 @@ exports.Socket = function(){
 		switch(type){
 			case Protocol.HOST_LOBBY:
 				if(!player.hosting){
-			console.log("sending host accept");
+					console.log("sending host accept");
 					var roomID = ++global.Labyrinth.roomID;
+					player.roomID = roomID;
 					console.log("Player " + player.rinfo.address + " created room " + roomID);
 					player.hosting = true;
 					global.Labyrinth.gamelist.push(new Game(roomID));
@@ -49,6 +50,10 @@ exports.Socket = function(){
 			console.log("something went wrong");
 					// something went wrong;
 					// server thought this player was hosting already but they sent another host request
+					global.Labyrinth.gamelist[player.roomID] = null;
+					global.Labyrinth.joinableGames--;
+					player.roomID = null;
+					player.hosting = false;
 				}
 				break;
 			case Protocol.JOIN_LOBBY:
@@ -59,11 +64,13 @@ exports.Socket = function(){
 				for(var i = 0; i < gameInstance.players.length; i++){
 					if(gameInstance.players[i] == null){
 						emptyIndex = i;
+						console.log("does this run when i can't join?")
 						break;
 					}
 				}
 				if(emptyIndex == -1){
-					// game is full
+						console.log("maybe this is the problem?")
+					me.SendDeny(player);
 				}else{
 					gameInstance.AddPlayer(player, emptyIndex);
 
@@ -74,10 +81,11 @@ exports.Socket = function(){
 				}
 				break;
 			case Protocol.LEAVE_LOBBY:
+				player.roomID = null;
 				var roomID = buff.readUInt8(1);
 				var gameInstance = global.Labyrinth.gamelist[roomID];
 				if(player.hosting){
-					// send kick to all players in that game.
+					me.SendHostLeft(global.Labyrinth.gamelist[roomID].players);
 					global.Labyrinth.gamelist[roomID] = null;
 					global.Labyrinth.joinableGames--;
 					player.hosting = false;
@@ -88,12 +96,14 @@ exports.Socket = function(){
 				}
 				break;
 			case Protocol.START_GAME:
-				global.Labyrinth.joinableGames--;
 				var roomID = buff.readUInt8(1);
 				var gameInstance = global.Labyrinth.gamelist[roomID];
-				me.SendLobbyState(gameInstance);
-				me.SendStartAccept(roomID);
-				global.Labyrinth.Play(roomID);
+				if(gameInstance.fullSeats >= 2){
+					global.Labyrinth.joinableGames--;
+					me.SendLobbyState(gameInstance);
+					me.SendStartAccept(roomID);
+					global.Labyrinth.Play(roomID);
+				}
 				break;
 			case Protocol.INPUT:
 				var flags = buff.readUInt8(1);
@@ -198,6 +208,29 @@ exports.Socket = function(){
 		buff.writeUInt8(roomID, 1);
 		buff.writeUInt8(playerID, 2);
 		me.Send(buff, player.rinfo);
+	};
+
+	this.SendDeny = function(player){
+		var buff = new Buffer(1);
+		var gameInstance = global.Labyrinth.gamelist[roomID];
+		buff.writeUInt8(Protocol.DENIED, 0);
+		me.Send(buff, player.rinfo);
+	};
+
+	this.SendHostLeft = function(players){
+		for(var i = 0; i < players.length; i++){
+			if(players[i] == null) continue;
+			if(players[i].hosting) players[i] = null;
+		}
+		var buff = new Buffer(1);
+		buff.writeUInt8(Protocol.DENIED, 0);
+		me.SendToPlayers(buff, players);
+	};
+
+	this.BroadcastKickAll = function(){
+		var buff = new Buffer(1);
+		buff.writeUInt8(Protocol.DENIED, 0);
+		me.Broadcast(buff);
 	};
 
 	this.SendLobbyState = function(gameInstance){

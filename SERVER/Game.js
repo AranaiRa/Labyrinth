@@ -45,7 +45,7 @@ exports.Game = function(gameID){
 
 	this.DisconnectPlayer = function(playerID){
 		if(me.players[playerID] != null){
-			global.Labyrinth.players.RemoveIndex(playerID);
+			global.Labyrinth.players.RemovePlayer(me.players[playerID]);
 			me.RemovePlayer(me.players[playerID]);
 			// TODO: broadcast disconnect to all other players - as a death?
 			console.log("disconnect player (timeout)")
@@ -94,19 +94,18 @@ exports.Game = function(gameID){
 
 		if(me.playersLeft == 1){ // all players are dead except 1, game is over
 			for(var j = 0; j < me.players.length; j++){ // find winner
+				if(me.players[j] == null) continue;
 				if(me.players[j].lives > 0){
 					winner = j+1;
-					break;
 				}
+				global.Labyrinth.players.RemovePlayer(me.players[j]);
 			}
 			console.log("GAME OVER! Player " + winner + " wins!");
 			global.Labyrinth.socket.SendKillPlayer(me, killedPlayerIndex, winner);
-			global.Labyrinth.gamelist[me.id] = null;
 
 		}else if(me.playersLeft < 1){
 			console.log("Two players died at the same time and there was a tie...");
 			global.Labyrinth.socket.SendKillPlayer(me, killedPlayerIndex, 20);
-			global.Labyrinth.gamelist[me.id] = null;
 		}
 
 		// otherwise there are 2 or more players left and game isn't over.
@@ -215,7 +214,12 @@ exports.Game = function(gameID){
 		global.Labyrinth.socket.SendWorldstatePlayers(me);
 		global.Labyrinth.socket.SendWorldstateEnemies(me);
 
-		setTimeout(me.GameLoop, global.Config.tick);
+		if(me.playersLeft <= 1){
+			console.log("I should be killing the game just once.");
+			global.Labyrinth.gamelist[me.id] = null;			
+		}else{
+			setTimeout(me.GameLoop, global.Config.tick);
+		}
 	};
 
 	this.ActivateSpawner = function(spawnID, playerID){

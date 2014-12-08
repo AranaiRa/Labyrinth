@@ -9,7 +9,7 @@ Client -> Server
 Server -> Client
 
 1:  BROADCAST_LOBBY_LIST
-2:  LOBBY_FULL
+2:  DENIED
 3:  JOIN_ACCEPT
 4:  BROADCAST_LOBBY_STATE (on join or leave)
 5:  START_ACCEPT
@@ -65,7 +65,7 @@ Server -> Client
 	----------------------------
 	(2 + n)		1	uint8	Available Seats
 
-	LOBBY_FULL (Sent if a player tries to join a room but it becomes full before client notices)
+	DENIED (Sent if a player tries to join a room but it becomes full before client notices, or host leaves)
 	O 	L 	Type 	Description
 	============================
 	0	1	uint8 	Packet Type

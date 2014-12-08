@@ -7,7 +7,7 @@
 		public function GSEnd(gsm:GameStateManager, winner:uint, yourID:uint) {
 			super(gsm);
 			
-			if(winner == yourID)
+			if(winner == yourID+1)
 				winnerText.text = "You win!";
 			else
 				winnerText.text = "Player " + winner + " wins!";

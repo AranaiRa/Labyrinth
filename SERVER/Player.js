@@ -7,6 +7,7 @@ exports.Player = function(rinfo){
 	this.hosting = false;
 	this.rinfo = rinfo;
 	this.timeSinceLastPacket = 0;
+	this.roomID;
 
 	this.Keys = {
 		Q:false, // attack 1
@@ -101,6 +102,16 @@ exports.Player = function(rinfo){
 		this.worldX = x;
 		this.worldY = y;
 		this.aabb = new AABB(this.worldX, this.worldY, this.width, this.height);
+		this.lives = 1;
+		this.health = 100;
+		this.maxHealth = 100;
+		this.hurtTimer = 0;
+		this.hurtTimerMax = 1.5;
+
+		this.energy = 100;
+		this.maxEnergy = 100;
+		this.damageMultiplier = 1;
+		this.speedMultiplier = 1;
 	};
 
 	this.Respawn = function(pos){
