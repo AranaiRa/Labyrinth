@@ -5,6 +5,7 @@
 	import flash.events.*;
 	import flash.utils.*;
 	
+	// This class is attached to the main timeline.
 	public class Main extends MovieClip {
 		
 		var time:int = 0; // milliseconds since launching application
@@ -22,6 +23,7 @@
 			addChild(gsm);
 		}
 		
+		// Get the amount of time passed since the last update.
 		function GetDeltaTime():Number{
 			var timeNew:int = getTimer();
 			var timeDelta:Number = (timeNew - time) / 1000;

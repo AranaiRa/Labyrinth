@@ -49,24 +49,34 @@
 						Main.gsm.ReceiveLobbyList(rooms, seats);
 					}
 					break;
+<<<<<<< HEAD
 				case Protocol.DENIED:
 					trace("packet received: lobby full or host left");
 					Main.gsm.SwitchToTitle();
+=======
+				// Lobby is full
+				case Protocol.LOBBY_FULL:
+					trace("packet received: lobby full error");
+>>>>>>> origin/master
 					break;
+				// Join request accepted
 				case Protocol.JOIN_ACCEPT:		
 					trace("packet received: join request accepted");
 					var roomID:uint = e.data.readUnsignedByte();
 					var playerID:uint = e.data.readUnsignedByte();
 					Main.gsm.SwitchToLobby(roomID, playerID);
 					break;
+				// Update to the lobby
 				case Protocol.LOBBY_STATE:		
 					trace("packet received: update lobby seats");
 					var seatsFull:uint = e.data.readUnsignedByte();
 					Main.gsm.UpdateLobby(seatsFull);
 					break;
+				// Begin game
 				case Protocol.START_ACCEPT:
 					Main.gsm.SwitchToPlay();
 					break;
+				// Info on all players
 				case Protocol.WORLDSTATE_PLAYERINFO:
 					var numPlayers:uint = e.data.readUnsignedByte();
 					for(var i:int = 0; i < numPlayers; i++){
@@ -76,11 +86,13 @@
 						Main.gsm.ReceiveWorldstatePlayer(pID, px, py);
 					}
 					break;
+				// Request to kill a specific player
 				case Protocol.KILL_PLAYER:
 					var playerToKill:uint = e.data.readUnsignedByte();
 					var winner:uint = e.data.readUnsignedByte();
 					Main.gsm.KillPlayer(playerToKill, winner);
 					break;
+				// Request to update this player's stats
 				case Protocol.STAT_UPDATE:
 					var hp:uint = e.data.readUnsignedShort();
 					var maxhp:uint = e.data.readUnsignedShort();
@@ -88,14 +100,17 @@
 					var maxenergy:uint = e.data.readUnsignedShort();
 					Main.gsm.UpdateStats(hp, maxhp, energy, maxenergy);
 					break;
+				// Request to add enemy to the world
 				case Protocol.ADD_ENEMY:
 					var eType:uint = e.data.readUnsignedByte();
 					Main.gsm.AddEnemy(eType);
 					break;
+				// Request to kill a specific enemy
 				case Protocol.REMOVE_ENEMY:
 					var eID:uint = e.data.readUnsignedByte();
 					Main.gsm.RemoveEnemy(eID);
 					break;
+				// Info on all enemies
 				case Protocol.WORLDSTATE_ENEMYINFO:
 					var numEnemies:uint = e.data.readUnsignedByte();
 					for(var i:int = 0; i < numEnemies; i++){
@@ -106,6 +121,7 @@
 						Main.gsm.ReceiveWorldstateEnemy(pID, playerID, px, py);
 					}
 					break;
+				// Info on all spawners
 				case Protocol.WORLDSTATE_SPAWNERINFO:
 					var numSpawners:uint = e.data.readUnsignedByte();
 					for(var i:int = 0; i < numSpawners; i++){
@@ -115,15 +131,18 @@
 						Main.gsm.ReceiveWorldstateSpawner(pID, px, py);
 					}
 					break;
+				// REquest to add a pickup to the world
 				case Protocol.ADD_PICKUP:
 					var pType:uint = e.data.readUnsignedByte();
 					var pAmount:uint = e.data.readUnsignedByte();
 					Main.gsm.AddPickup(pType, pAmount);
 					break;
+				// Request to remove a specific pickup
 				case Protocol.REMOVE_PICKUP:
 					var pID:uint = e.data.readUnsignedByte();
 					Main.gsm.RemovePickup(pID);
 					break;
+				// Info on all pickups
 				case Protocol.WORLDSTATE_PICKUPINFO:
 					var numPickups:uint = e.data.readUnsignedByte();
 					for(var i:int = 0; i < numPickups; i++){

@@ -3,6 +3,7 @@
 	import flash.events.*;
 	import flash.system.*;
 	
+	// This class controls the title screen.
 	public class GSTitle extends GameState{
 
 		public function GSTitle(gsm:GameStateManager) {
@@ -15,6 +16,11 @@
 			bttnQuit.addEventListener(MouseEvent.CLICK, HandleQuit);
 		}
 		
+		public override function Update():void{
+			
+		}
+		
+		/////BUTTON FUNCTIONS
 		public function HandleHost(e:MouseEvent):void{
 			Main.socket.SendPacketHostLobby();
 		}
@@ -33,10 +39,6 @@
 		
 		public function HandleQuit(e:MouseEvent):void{
 			fscommand("quit");
-		}
-		
-		public override function Update():void{
-			
 		}
 	}
 }

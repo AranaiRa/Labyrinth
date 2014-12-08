@@ -2,7 +2,7 @@
 	
 	import flash.display.MovieClip;
 	
-	
+	// This class is used to track projectiles.
 	public class EnemyBullet extends Enemy {
 						
 		public function EnemyBullet(degrees:Number) {

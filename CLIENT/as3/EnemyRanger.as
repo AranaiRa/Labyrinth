@@ -2,7 +2,7 @@
 	
 	import flash.display.MovieClip;
 	
-	
+	// This class controls ranger-type enemies.
 	public class EnemyRanger extends Enemy {
 		
 		public function EnemyRanger(x:Number, y:Number) {			

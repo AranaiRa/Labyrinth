@@ -1,6 +1,7 @@
 ﻿package as3 {
 	import flash.display.MovieClip;
 	
+	// This class controls game state flow.
 	public class GameStateManager extends MovieClip{
 		
 		var gsCurrent:GameState;
@@ -11,6 +12,7 @@
 		}
 		
 		public function Update(dt:Number):void{			
+			// Only update the current game state.
 			if(gsCurrent != null){
 				gsCurrent.Update();
 			}
@@ -46,7 +48,8 @@
 				(gsCurrent as GSPlay).UpdateStats(hp, maxhp, energy, maxenergy);
 			}
 		}
-
+		
+		// Adds an enemy to the world. Only works in GSPlay. Use static values assigned in Enemy eType.
 		public function AddEnemy(eType:uint):void{
 			if(gsCurrent is GSPlay){
 				(gsCurrent as GSPlay).AddEnemy(eType);

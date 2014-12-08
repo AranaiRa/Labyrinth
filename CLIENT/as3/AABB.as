@@ -1,5 +1,6 @@
 ﻿package as3 {
 	
+	// This class represents an axis-aligned bounding box. Used for collision information.
 	public class AABB {
 		
 		public var x:Number, y:Number, halfW:Number, halfH:Number;
@@ -21,6 +22,7 @@
 			this.Bottom = y + halfH;
 		}
 		
+		// Compares this bounding box to another to see if there's any overlap.
 		public function IsCollidingWith(other:AABB):Boolean{
 			if(this.Right < other.Left) return false;
 			if(this.Left > other.Right) return false;

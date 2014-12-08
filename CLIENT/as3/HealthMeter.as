@@ -2,6 +2,7 @@
 	
 	import flash.display.MovieClip;
 	
+	// This class controls the player's health bar GUI.
 	public class HealthMeter extends MovieClip {
 		
 		var bar:MovieClip;

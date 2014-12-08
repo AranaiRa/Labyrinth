@@ -69,6 +69,7 @@
 			}
 		}
 		
+		//Checks whether a specific key is down this frame, but not down last frame.
 		static function OnPress(key:String):Boolean{
 			switch(key){
 				case "AttackQ":

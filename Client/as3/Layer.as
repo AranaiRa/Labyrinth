@@ -1,5 +1,6 @@
 ﻿package as3 {
 	
+	// This class stores static data storing what order draw calls are to be made in.
 	public class Layer {
 		
 		public static var LEVELBG:int = 1;

@@ -4,6 +4,7 @@
 	import flash.display.Stage;
 	import flash.utils.Timer;
 	
+	// This class keeps track of a bunch of static variables.
 	public class Config {
 		
 		static var StageWidth:int = 800;

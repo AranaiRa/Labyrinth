@@ -2,8 +2,10 @@
 	
 	import flash.display.MovieClip;
 	
+	//This class controls stat-enhancing pickups.
 	public class Pickup extends MovieClip {
 		
+		// Static values for powerup type.
 		public static var HPUP:int = 1;
 		public static var ATKUP:int = 2;
 		//public static var ENERGYATKUP:int = 3;

@@ -3,6 +3,7 @@
 	import flash.display.DisplayObject;
 	import flash.geom.Point;
 	
+	// This class keeps track of collision information for the level.
 	public class Level extends MovieClip{
 
 		var levelData:LevelData = new LevelData();
@@ -30,6 +31,7 @@
 				} // end j loop
 			} // end i loop
 			
+			// Debug loop that prints out a visual representation of the level's collision data to the console.
 			for (var i:uint = 0; i < levelData.width; i++){
 					levelString += "\n";
 				for (var j:uint = 0; j < levelData.height; j++){
@@ -45,14 +47,17 @@
 			}
 		}
 
+		// Converts gridspace to worldspace.
 		public function GridToWorld(n:Number):Number{
 				return (n * size) - (size/2);
 		}
 
+		// Converts worldspace to gridspace.
 		public function WorldToGrid(n:Number):int{
 				return (int)((n + size/2) / size);
 		}
 		
+		// Returns whether the indicated grid point is solid.
 		public function CheckCollisionAt(px:int, py:int):Boolean {
 			if (px < 0) return false; // this allows player to move outside grid area
 			if (py < 0) return false;

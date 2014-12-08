@@ -3,6 +3,7 @@
 	import flash.display.MovieClip;
 	import flash.events.*;	
 	
+	// This class controls the lobby screen.
 	public class GSLobby extends GameState {
 		
 		public var players:Array = new Array(null, null, null, null, null, null, null, null);
@@ -25,7 +26,8 @@
 			
 			nameTexts.push(name1, name2, name3, name4, name5, name6, name7, name8);
 			lobbyText.text = "Lobby #" + roomID;
-
+			
+			// Checks to see whether you're the host player or not.
 			if(hosting){
 				name1.text = "Player 1 (You)";
 			}else{
@@ -60,6 +62,7 @@
 			if(hosting && numPlayers > 1) bttnStart.visible = true;
 		}
 		
+		//////////BUTTON FUNCTIONS
 		public function HandleStart(e:MouseEvent):void{
 			Main.socket.SendPacketStartGame(roomID);
 		}
