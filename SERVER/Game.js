@@ -101,10 +101,12 @@ exports.Game = function(gameID){
 			}
 			console.log("GAME OVER! Player " + winner + " wins!");
 			global.Labyrinth.socket.SendKillPlayer(me, killedPlayerIndex, winner);
+			global.Labyrinth.gamelist[me.id] = null;
 
 		}else if(me.playersLeft < 1){
 			console.log("Two players died at the same time and there was a tie...");
 			global.Labyrinth.socket.SendKillPlayer(me, killedPlayerIndex, 20);
+			global.Labyrinth.gamelist[me.id] = null;
 		}
 
 		// otherwise there are 2 or more players left and game isn't over.

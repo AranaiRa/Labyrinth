@@ -11,7 +11,7 @@
 			bttnHost.addEventListener(MouseEvent.CLICK, HandleHost);
 			bttnJoin.addEventListener(MouseEvent.CLICK, HandleJoin);
 			bttnCredits.addEventListener(MouseEvent.CLICK, HandleCredits);
-			bttnInstructions.addEventListener(MouseEvent.CLICK, HandleInstructions);
+			//bttnInstructions.addEventListener(MouseEvent.CLICK, HandleInstructions);
 			bttnQuit.addEventListener(MouseEvent.CLICK, HandleQuit);
 		}
 		
@@ -27,9 +27,9 @@
 			gsm.SwitchToCredits();
 		}
 		
-		public function HandleInstructions(e:MouseEvent):void{
+		/*public function HandleInstructions(e:MouseEvent):void{
 			gsm.SwitchToInstructions();
-		}
+		}*/
 		
 		public function HandleQuit(e:MouseEvent):void{
 			fscommand("quit");

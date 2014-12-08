@@ -19,6 +19,7 @@ exports.AABB = function(x, y, width, height){
 		this.Bottom = y + this.halfH;
 	};
 	
+	// simple axis aligned bounding box overlap collision
 	this.IsCollidingWith = function(other){
 		if(this.Right < other.Left) return false;
 		if(this.Left > other.Right) return false;

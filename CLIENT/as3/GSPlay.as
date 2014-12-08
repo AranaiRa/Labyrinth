@@ -72,7 +72,7 @@
 
 		public function KillPlayer(playerToKill:uint, winner:uint):void{
 			if(winner > 0){
-				// switch to end of game
+				Main.gsm.SwitchToEnd(winner, playerID);
 			}
 
 			if(playerToKill == playerID){

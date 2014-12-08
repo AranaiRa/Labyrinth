@@ -4,18 +4,23 @@
 	
 	public class GSEnd extends GameState {
 		
-		public function GSEnd(gsm:GameStateManager) {
+		public function GSEnd(gsm:GameStateManager, winner:uint, yourID:uint) {
 			super(gsm);
 			
-			bttnLeave.addEventListener(MouseEvent.CLICK, leaveFunction);
-		}
-		
-		public function leaveFunction(e:MouseEvent):void{
-			gsm.SwitchToTitle();
+			if(winner == yourID)
+				winnerText.text = "You win!";
+			else
+				winnerText.text = "Player " + winner + " wins!";
+				
+			bttnBack.addEventListener(MouseEvent.CLICK, BackFunction);
 		}
 		
 		public override function Update():void{
 			
+		}
+		
+		public function BackFunction(e:MouseEvent):void{
+			gsm.SwitchToTitle();
 		}
 	}
 }

@@ -17,12 +17,10 @@ global.Config = {
 global.Random = {
 	Range:function(min, max){ // max is exclusive
 		var num = (Math.random() * (max - min)) + min;
-		//console.log("Random number: " + num);
 		return num;
 	},
 	RangeInt:function(min, max){ // max is inclusive
 		var num = Math.floor(Math.random() * (max - min + 1)) + min;
-		//console.log("Random number: " + num);
 		return num;
 	},
 	ChooseOne:function(array){

@@ -129,9 +129,9 @@
 			addChild(gsCurrent);
 	    }
 
-	    public function SwitchToEnd():void {
+	    public function SwitchToEnd(winner:uint, yourID:uint):void {
 			removeChild(gsCurrent);
-			gsCurrent = new GSEnd(this);
+			gsCurrent = new GSEnd(this, winner, yourID);
 			addChild(gsCurrent);
 	    }
 

@@ -4,7 +4,7 @@
 	
 	public class GSEnd extends GameState {
 		
-		public function GSEnd(gsm:GameStateManager, winner:int) {
+		public function GSEnd(gsm:GameStateManager, winner:uint, yourID:uint) {
 			super(gsm);
 			
 			bttnLeave.addEventListener(MouseEvent.CLICK, leaveFunction);
