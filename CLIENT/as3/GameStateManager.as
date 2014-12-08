@@ -58,9 +58,9 @@
 			addChild(gsCurrent);
     }
 
-    public function SwitchToEnd():void {
-			removeChild(gsCurrent);
-     gsCurrent = new GSEnd(this);
+    public function SwitchToEnd(winner:int):void {
+			if(gsCurrent != null) removeChild(gsCurrent);
+     		gsCurrent = new GSEnd(this, winner); //TODO: Set winning player
 			addChild(gsCurrent);
     }
 
