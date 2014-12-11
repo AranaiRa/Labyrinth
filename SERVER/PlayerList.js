@@ -69,7 +69,7 @@ exports.PlayerList = function(){
 	this.RemoveIndex = function(index){
 		if(index < this.players.length - 1 && this.players[index] != null)
 			return this.players.splice(index, 1)[0];
-		else
+		//else
 			//console.log("Player index does not exist or is null.");
 	};
-};
+}

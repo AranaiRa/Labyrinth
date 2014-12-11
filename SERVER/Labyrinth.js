@@ -3,11 +3,13 @@ var Socket = require("./Socket.js").Socket;
 var PlayerList = require("./PlayerList.js").PlayerList;
 var GameList = require("./GameList.js").GameList;
 var Game = require("./Game.js").Game;
+//var InetAddress = require("");
 
 global.Config = {
 	gravity:2,
 	tick:33,
-	BROADCASTIP: "10.0.0.255", //"10.252.20.249",//
+	LOCALIP: "127.0.0.1",
+	BROADCASTIP: "255.255.255.255", //"10.252.20.249",//
 	SERVERPORT:1236,
 	CLIENTPORT:4326,
 	tileSize:64,

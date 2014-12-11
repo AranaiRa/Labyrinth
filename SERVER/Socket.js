@@ -125,18 +125,75 @@ exports.Socket = function(){
 	});
 
 	this.socket.on("listening", function(){
-		console.log("listening on port " + global.Config.SERVERPORT);
+		console.log("Listening on " + global.Config.LOCALIP + ":" + global.Config.SERVERPORT);
 	});
 
 	this.Listen = function(){
 		this.socket.bind(global.Config.SERVERPORT);
+		/***/
+
+		var os=require('os');
+		var ifaces=os.networkInterfaces();
+		var found = false;
+		console.log("Attempting to determine local IP...");
+		for (var dev in ifaces) {
+			if(!found){
+				ifaces[dev].forEach(function(details){
+					if (!found && details.family=='IPv4' && dev == "Local Area Connection"){
+						global.Config.LOCALIP = details.address;
+						global.Config.BROADCASTIP = me.GetBroadcastIP(details.address, "255.255.255.0"); //Assuming the subnet mask is 255.255.255.0
+						found = true;
+					}
+				});
+			}
+		}
+		console.log("Your local IP is " + global.Config.LOCALIP);
+		console.log("Your broadcast IP is " + global.Config.BROADCASTIP);
+
+		//var IP = new java.net.InetAddress.getLocalHost();
+		//console.log("IP of my system is := "+IP.getHostAddress());
 	};
 
+	// broadcasts the lobby list every 4 seconds if lobby list is not empty
 	this.Update = function(){
 		if(global.Labyrinth.joinableGames > 0){
 			me.BroadcastLobbyList();
 			setTimeout(me.Update, 4000);
 		}
+	}
+
+	// takes 2 string representations of local IP and subnet mask
+	// returns broadcast IP as a string
+	this.GetBroadcastIP = function(ip, mask){
+		ip = this.IP4toUInt32(ip);
+		mask = this.IP4toUInt32(mask);
+		return this.UInt32toIP4(ip | ~mask);
+	}
+
+	// converts string IP4 addresses into a uint32
+	this.IP4toUInt32 = function(str){
+		var parts = str.split(".");
+		var total = 0;
+
+		var counter = 3;
+		for(var i = 0; i < parts.length; i++){
+			parts[i] = parseInt(parts[i]);
+
+			total |= parts[i]<<counter * 8;
+			counter--;
+		}
+
+		return total;
+	}
+
+	// converts uint32 IP4 addresses into a string
+	this.UInt32toIP4 = function(i){
+		var p4 = i & 255;
+		var p3 = (i>>8) & 255;
+		var p2 = (i>>16) & 255;
+		var p1 = (i>>24) & 255;
+
+		return [p1, p2, p3, p4].join(".");
 	}
 
 	this.Send = function(buff, rinfo){
